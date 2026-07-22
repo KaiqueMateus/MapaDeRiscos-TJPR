@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Referências e Metodologia - TJPR</title>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1929'/><path d='M25 20h50v60H25z' fill='%234dd0e1'/><path d='M32 30h36M32 40h36M32 50h36M32 60h20' stroke='%230a1929' stroke-width='3'/></svg>">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/css/riscos.css">
+
+  <script>
+    const t = localStorage.getItem("mapa_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", t);
+  </script>
+  <script src="assets/js/auth.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="top-header d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center gap-3">
+    <img src="assets/img/logo-tjpr.png" alt="TJPR" class="header-logo">
+    <div class="app-title-mini">
+      <div class="app-name">Referências</div>
+      <div class="app-desc">Metodologia - Gestão de Riscos</div>
+    </div>
+  </div>
+  <div class="d-flex align-items-center gap-2">
+    <div class="user-badge">
+      <div class="user-avatar" id="userAvatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Carregando...</div>
+        <div class="user-division">
+          <i class="bi bi-diagram-3"></i>
+          <span id="userDivision">--</span>
+        </div>
+      </div>
+    </div>
+    
+
+    <button class="btn btn-icon" onclick="toggleSom()" id="btnSom" title="Ativar/desativar sons">
+  <i class="bi bi-volume-up-fill" id="iconSom"></i>
+</button>
+<button class="btn btn-icon" onclick="toggleTheme()" id="btnTheme" title="Alternar tema">
+      <i class="bi bi-moon-stars-fill" id="iconTheme"></i>
+    </button>
+<button class="btn btn-logs" onclick="abrirModalLogs()">
+  <i class="bi bi-journal-text"></i> Logs
+</button>
+
+<button class="btn btn-logout" onclick="logout()">
+  <i class="bi bi-box-arrow-right"></i> Sair
+</button>
+    <a href="index.html" class="btn btn-logs">
+      <i class="bi bi-arrow-left"></i> Voltar ao Registro
+    </a>
+  </div>
+</header>
+
+<!-- BOTÃO HAMBURGER + PAINEL -->
+<button class="nav-hamburger" id="navHamburger" onclick="toggleNavMenu()" title="Menu">
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+</button>
+
+<aside class="nav-panel" id="navPanel">
+  <div class="nav-panel-header">
+    <div class="nav-panel-title">
+      <i class="bi bi-compass"></i>
+      <span>Navegação</span>
+    </div>
+    <button class="nav-panel-close" onclick="toggleNavMenu()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <nav class="nav-links">
+
+    <a href="dashboard.html" class="nav-link" id="linkDashboard">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Dashboard</div>
+        <div class="nav-link-desc">Visão Geral e KPIs</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="index.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Registro de Riscos</div>
+        <div class="nav-link-desc">Cadastro e análise</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="tratamento.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-shield-check"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Tratamento de Riscos</div>
+        <div class="nav-link-desc">Ações e planos de mitigação</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="referências.html" class="nav-link active">
+      <div class="nav-link-icon"><i class="bi bi-book-half"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Referências</div>
+        <div class="nav-link-desc">Guias e normativos</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+  </nav>
+
+  <div class="nav-panel-footer">
+    <span>Gestão de Riscos • TJPR</span>
+  </div>
+</aside>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNavMenu()"></div>
+
+<!-- MAIN -->
+<main class="main-area">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon"><i class="bi bi-book-half"></i></div>
+      <div>
+        <h1 class="hero-title">Referências e Metodologia</h1>
+        <p class="hero-subtitle">
+          Tabelas de apoio para o mapeamento e avaliação de riscos, conforme o
+          <span class="division-highlight">Padrão TJPR</span>
+        </p>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+    </div>
+  </section>
+
+  <!-- GRID DE 2 COLUNAS -->
+  <div class="ref-grid">
+
+    <!-- COLUNA ESQUERDA -->
+    <div class="ref-col">
+
+      <!-- TIPOS DE CONTROLE -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-shield-lock"></i> Tipos de Controle</h2>
+        </div>
+        <div class="table-wrapper">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Controle</th>
+                <th>Exemplo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="strong">Conferência</td><td>Utilização de checklists</td></tr>
+              <tr><td class="strong">Segregação de funções</td><td>Separação das funções de autorização, execução, registro e controle</td></tr>
+              <tr><td class="strong">Procedimentos de autorização e aprovação</td><td>Utilização de sistema de autorização e aprovação e, se possível, com segregação de funções</td></tr>
+              <tr><td class="strong">Controles de acesso a recursos</td><td>Utilização de senhas para controle de acesso a recursos</td></tr>
+              <tr><td class="strong">Verificações</td><td>Elaboração e conferência de um documento por pessoas distintas</td></tr>
+              <tr><td class="strong">Supervisão</td><td>Adoção de um supervisor para revisar e validar uma atividade</td></tr>
+              <tr><td class="strong">Conciliações</td><td>Conferência da mesma informação vinda de bases diferentes</td></tr>
+              <tr><td class="strong">Controle físico</td><td>Contagem de estoque</td></tr>
+              <tr><td class="strong">Capacitação e treinamento</td><td>Cursos, palestras, seminários, etc.</td></tr>
+              <tr><td class="strong">Políticas e Procedimentos</td><td>Instruções Normativas, POP, etc.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EFICÁCIA DO CONTROLE -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-graph-up-arrow"></i> Eficácia do Controle</h2>
+        </div>
+        <div class="table-wrapper">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Eficácia</th>
+                <th>Descrição</th>
+                <th class="text-end">Multipl.</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="strong">Inexistente</td><td>Não há nenhum controle, o controle não é funcional ou é mal implementado.</td><td class="text-end"><span class="mult-value">1,00</span></td></tr>
+              <tr><td class="strong">Fraco</td><td>Existe algum controle, geralmente manual, apenas o executor conhece o procedimento. Responsabilidade individual, dependência total da pessoa que executa.</td><td class="text-end"><span class="mult-value">0,90</span></td></tr>
+              <tr><td class="strong">Mediano</td><td>Existe controle, porém não é o mais adequado. Mitiga algum aspecto do risco, mas não contempla todas as perspectivas.</td><td class="text-end"><span class="mult-value">0,75</span></td></tr>
+              <tr><td class="strong">Satisfatório</td><td>Controle formalizado, pode não considerar todos os aspectos relevantes, mas mitiga o risco com auxílio de ferramentas apropriadas.</td><td class="text-end"><span class="mult-value">0,60</span></td></tr>
+              <tr><td class="strong">Forte</td><td>Controle ideal, formalizado e capaz de mitigar o risco considerando todos os aspectos relevantes.</td><td class="text-end"><span class="mult-value">0,50</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- COLUNA DIREITA -->
+    <div class="ref-col">
+
+      <!-- ESCALA DE IMPACTO -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-bar-chart-fill"></i> Escala de Impacto</h2>
+        </div>
+        <div class="table-wrapper">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Impacto</th>
+                <th>Descrição</th>
+                <th class="text-end">Grau</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="strong">Muito baixo</td><td>Impacto tem influência mínima no alcance do objetivo.</td><td class="text-end"><span class="grau-num">1</span></td></tr>
+              <tr><td class="strong">Baixo</td><td>Impacto afeta parcialmente o alcance do objetivo, porém não impede que a maior parte seja alcançada.</td><td class="text-end"><span class="grau-num">2</span></td></tr>
+              <tr><td class="strong">Médio</td><td>Impacto compromete de maneira significativa o atingimento do objetivo.</td><td class="text-end"><span class="grau-num">3</span></td></tr>
+              <tr><td class="strong">Alto</td><td>Impacto prejudica grande parte do alcance do objetivo.</td><td class="text-end"><span class="grau-num">4</span></td></tr>
+              <tr><td class="strong">Muito alto</td><td>Impacto inviabiliza completamente ou quase completamente o alcance do objetivo.</td><td class="text-end"><span class="grau-num">5</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ESCALA DE PROBABILIDADE -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-percent"></i> Escala de Probabilidade</h2>
+        </div>
+        <div class="table-wrapper">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Probabilidade</th>
+                <th>Descrição</th>
+                <th class="text-end">Grau</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="strong">Raro</td><td>Evento ocorre somente em circunstâncias extraordinárias.</td><td class="text-end"><span class="grau-num">1</span></td></tr>
+              <tr><td class="strong">Pouco provável</td><td>Evento com baixa frequência de ocorrência durante o período determinado.</td><td class="text-end"><span class="grau-num">2</span></td></tr>
+              <tr><td class="strong">Provável</td><td>Evento com razoável frequência de ocorrência durante o período determinado.</td><td class="text-end"><span class="grau-num">3</span></td></tr>
+              <tr><td class="strong">Muito provável</td><td>Evento que se repete com alta frequência durante o período determinado.</td><td class="text-end"><span class="grau-num">4</span></td></tr>
+              <tr><td class="strong">Praticamente certo</td><td>Evento com ocorrência praticamente certa durante o período determinado.</td><td class="text-end"><span class="grau-num">5</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- NÍVEL DE RISCO E DIRETRIZ -->
+      <section class="panel-card">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-signpost-split"></i> Nível de Risco e Diretriz</h2>
+        </div>
+        <div class="table-wrapper">
+          <table class="ref-table">
+            <thead>
+              <tr>
+                <th>Nível</th>
+                <th>Faixa</th>
+                <th>Diretriz</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="nivel-badge badge-alto">Alto</span></td>
+                <td><span class="faixa faixa-alto">20 – 25</span></td>
+                <td><strong>Inaceitável:</strong> acima do limite de exposição da instituição. Requer tratamento específico.</td>
+              </tr>
+              <tr>
+                <td><span class="nivel-badge badge-medio">Médio</span></td>
+                <td><span class="faixa faixa-medio">7 – 19</span></td>
+                <td><strong>Aceitável:</strong> dentro do apetite a risco, tratamento facultativo, monitoramento contínuo.</td>
+              </tr>
+              <tr>
+                <td><span class="nivel-badge badge-baixo">Baixo</span></td>
+                <td><span class="faixa faixa-baixo">1 – 6</span></td>
+                <td><strong>Aceitável:</strong> dentro do apetite a risco da instituição.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</main>
+<div id="toast" class="toast-notification"></div>
+<div id="confetti-container"></div>
+<script src="assets/js/riscos.js"></script>
+<script src="assets/js/backup.js"></script>
+<!-- MODAL BACKUP -->
+<div class="modal-overlay" id="modalBackup" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="bi bi-cloud-arrow-down-fill"></i> Backup & Restauração</h2>
+      <button class="modal-close" onclick="fecharModalBackup()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- STATUS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-clock-history"></i> Último Backup</h4>
+        <div id="statusUltimoBackup" class="backup-status">Verificando...</div>
+      </div>
+
+      <!-- EXPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-download"></i> Exportar Backup</h4>
+        <p class="backup-desc">Baixa um arquivo <strong>.json</strong> com todos os seus dados: processos, riscos, tratamentos e logs.</p>
+        <button class="btn-backup-primary" onclick="exportarBackup()">
+          <i class="bi bi-cloud-arrow-down-fill"></i> Exportar TUDO
+        </button>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-upload"></i> Importar Backup</h4>
+        <p class="backup-desc">Restaura dados de um arquivo <strong>.json</strong> exportado anteriormente.</p>
+        <button class="btn-backup-secondary" onclick="abrirSeletorArquivoBackup()">
+          <i class="bi bi-cloud-arrow-up-fill"></i> Selecionar arquivo...
+        </button>
+        <input type="file" id="inputArquivoBackup" accept=".json,application/json" style="display:none;" onchange="processarArquivoBackup(event)">
+      </div>
+
+      <!-- ESTATÍSTICAS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-bar-chart-line"></i> Estatísticas</h4>
+        <div id="estatisticasBackup" class="backup-stats">Carregando...</div>
+      </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div class="backup-secao backup-danger">
+        <h4><i class="bi bi-exclamation-triangle-fill"></i> Zona de Perigo</h4>
+        <p class="backup-desc">Ação irreversível. Faça backup antes.</p>
+        <button class="btn-backup-danger" onclick="limparTodosDados()">
+          <i class="bi bi-trash-fill"></i> Apagar TODOS os dados
+        </button>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalBackup()">
+        <i class="bi bi-x-circle"></i> Fechar
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

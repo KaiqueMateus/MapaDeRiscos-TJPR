@@ -1,0 +1,290 @@
+/* ========== VARIÁVEIS ========== */
+:root{
+  --bg-gradient: linear-gradient(135deg, #0f2a35 0%, #143a4a 40%, #1c4d5f 100%);
+  --header-bg: #0f1f27;
+  --card-bg: rgba(20, 55, 68, 0.55);
+  --card-border: rgba(120, 200, 210, 0.25);
+  --text-main: #e6f1f5;
+  --text-muted: #9fb7c1;
+  --accent: #4dd0e1;
+  --accent-blue: #3a8fd8;
+  --highlight-border: #4dd0e1;
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: var(--text-main);
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========== HEADER TOPO (cor da antiga sidebar) ========== */
+.top-header{
+  background: var(--header-bg);
+  padding: 12px 30px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.header-logo{
+  max-height: 60px;
+  width: auto;
+  display: block;
+}
+
+.status-badge{
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid rgba(77, 208, 225, 0.25);
+  border-radius: 30px;
+  padding: 6px 16px;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pulse-dot{
+  width: 8px;
+  height: 8px;
+  background: #3ad48a;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(58, 212, 138, 0.6);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse{
+  0%   { box-shadow: 0 0 0 0 rgba(58, 212, 138, 0.6); }
+  70%  { box-shadow: 0 0 0 10px rgba(58, 212, 138, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(58, 212, 138, 0); }
+}
+
+.btn-options{
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.btn-options:hover{
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+}
+
+/* ========== MAIN (largura total, sem sidebar) ========== */
+.main-area{
+  padding: 20px 30px;
+}
+
+/* ========== PANEL CARD ========== */
+.panel-card{
+  background: rgba(15, 45, 55, 0.45);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 15px 20px;
+  margin-bottom: 15px;
+  backdrop-filter: blur(4px);
+}
+
+.panel-card-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.panel-card-header h2{
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.btn-open{
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  font-size: 12px;
+  padding: 3px 12px;
+}
+.btn-open:hover{ background: rgba(77, 208, 225, 0.1); color: var(--accent); }
+
+/* ========== KPI BOX ========== */
+.kpi-box{
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  height: 100%;
+}
+.kpi-label{
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 4px;
+}
+.kpi-value{
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0;
+}
+.kpi-highlight{
+  border: 1.5px solid var(--highlight-border);
+  border-radius: 30px;
+  padding: 10px;
+  margin-top: 12px;
+}
+
+/* ========== CHART BOX ========== */
+.chart-box{
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 12px 15px;
+  height: 100%;
+  min-height: 260px;
+  position: relative;
+}
+.chart-box h3{
+  font-size: 13px;
+  color: var(--text-main);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.chart-box canvas{
+  max-height: 240px;
+}
+
+/* ========== FOOTER ========== */
+.page-footer{
+  background: var(--header-bg);
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 12px 30px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  margin-top: 20px;
+}
+.page-footer em{ color: #cfe1e7; }
+
+/* ========== SCROLLBAR AZUL (estilo Qlik) ========== */
+html, body, .main-area, .chart-box{
+  scrollbar-width: thin;
+  scrollbar-color: #4a90d9 rgba(15, 45, 55, 0.4);
+}
+
+::-webkit-scrollbar{
+  width: 12px;
+  height: 12px;
+}
+::-webkit-scrollbar-track{
+  background: rgba(15, 45, 55, 0.4);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg, #4a90d9 0%, #3a7fbf 100%);
+  border-radius: 10px;
+  border: 2px solid rgba(15, 45, 55, 0.4);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.3);
+}
+::-webkit-scrollbar-thumb:hover{
+  background: linear-gradient(180deg, #5aa0e9 0%, #4a90d9 100%);
+}
+::-webkit-scrollbar-corner{
+  background: rgba(15, 45, 55, 0.4);
+}
+
+/* ========== RESPONSIVO ========== */
+@media (max-width: 768px){
+  .top-header{ padding: 10px 15px; flex-wrap: wrap; gap: 10px; }
+  .header-logo{ max-height: 45px; }
+  .status-badge{ font-size: 11px; padding: 5px 12px; }
+  .main-area{ padding: 15px; }
+}
+
+/* ============ CORES DOS LINKS DE NAVEGAÇÃO ============ */
+
+/* 🟡 Dashboard - hover amarelo */
+.nav-link[href="dashboard.html"]:hover {
+  background: rgba(245, 201, 74, 0.12);
+  border-color: rgba(245, 201, 74, 0.4);
+}
+.nav-link[href="dashboard.html"]:hover .nav-link-icon {
+  background: rgba(245, 201, 74, 0.2);
+  color: var(--accent-yellow);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="dashboard.html"]:hover .nav-link-arrow {
+  color: var(--accent-yellow);
+}
+.nav-link[href="dashboard.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(245, 201, 74, 0.2), transparent);
+}
+
+/* 🔴 Tratamento de Riscos - hover vermelho (já existente, garantindo) */
+.nav-link[href="tratamento.html"]:hover {
+  background: rgba(224, 90, 90, 0.12);
+  border-color: rgba(224, 90, 90, 0.4);
+}
+.nav-link[href="tratamento.html"]:hover .nav-link-icon {
+  background: rgba(224, 90, 90, 0.2);
+  color: var(--accent-red);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="tratamento.html"]:hover .nav-link-arrow {
+  color: var(--accent-red);
+}
+.nav-link[href="tratamento.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(224, 90, 90, 0.2), transparent);
+}
+
+/* ⚪ Referências - hover cinza (já existente, garantindo) */
+.nav-link[href="referencias.html"]:hover {
+  background: rgba(159, 183, 193, 0.12);
+  border-color: rgba(159, 183, 193, 0.35);
+}
+.nav-link[href="referencias.html"]:hover .nav-link-icon {
+  background: rgba(159, 183, 193, 0.2);
+  color: var(--text-muted);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="referencias.html"]:hover .nav-link-arrow {
+  color: var(--text-muted);
+}
+.nav-link[href="referencias.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(159, 183, 193, 0.2), transparent);
+}
+
+/* 🎯 Estado ATIVO com cor específica */
+.nav-link[href="dashboard.html"].active {
+  background: linear-gradient(135deg, rgba(245, 201, 74, 0.18), rgba(245, 201, 74, 0.08));
+  border-color: rgba(245, 201, 74, 0.5);
+}
+.nav-link[href="dashboard.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--accent-yellow), #e88c3a);
+  color: #0a1929;
+}
+
+.nav-link[href="tratamento.html"].active {
+  background: linear-gradient(135deg, rgba(224, 90, 90, 0.18), rgba(224, 90, 90, 0.08));
+  border-color: rgba(224, 90, 90, 0.5);
+}
+.nav-link[href="tratamento.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--accent-red), #c04040);
+  color: #fff;
+}
+
+.nav-link[href="referencias.html"].active {
+  background: linear-gradient(135deg, rgba(159, 183, 193, 0.18), rgba(159, 183, 193, 0.08));
+  border-color: rgba(159, 183, 193, 0.5);
+}
+.nav-link[href="referencias.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--text-muted), #6b7d8f);
+  color: #fff;
+}

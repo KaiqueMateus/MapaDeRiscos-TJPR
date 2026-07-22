@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Executivo - TJPR</title>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1929'/><rect x='20' y='45' width='12' height='35' fill='%234dd0e1'/><rect x='38' y='30' width='12' height='50' fill='%233ad48a'/><rect x='56' y='20' width='12' height='60' fill='%23f5c94a'/><rect x='74' y='55' width='12' height='25' fill='%23e05a5a'/></svg>">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/css/riscos.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
+  <script>
+    const t = localStorage.getItem("mapa_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", t);
+  </script>
+  <script src="assets/js/auth.js"></script>
+   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+             <script src="assets/js/supabase-client.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="top-header d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center gap-3">
+    <img src="assets/img/logo-tjpr.png" alt="TJPR" class="header-logo">
+    <div class="app-title-mini">
+      <div class="app-name">Dashboard Executivo</div>
+      <div class="app-desc">Visão geral - Gestão de Riscos</div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2">
+    <div class="user-badge">
+      <div class="user-avatar" id="userAvatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Carregando...</div>
+        <div class="user-division">
+          <i class="bi bi-diagram-3"></i>
+          <span id="userDivision">--</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-icon" onclick="toggleApresentacao()" id="btnPres" title="Modo Apresentação (F11)">
+  <i class="bi bi-easel-fill" id="iconPres"></i>
+</button>
+
+    <button class="btn btn-icon" onclick="toggleSom()" id="btnSom" title="Sons">
+      <i class="bi bi-volume-up-fill" id="iconSom"></i>
+    </button>
+    <button class="btn btn-icon" onclick="toggleTheme()" id="btnTheme" title="Tema">
+      <i class="bi bi-moon-stars-fill" id="iconTheme"></i>
+    </button>
+      <button class="btn btn-logs" onclick="abrirModalLogs()">
+      <i class="bi bi-journal-text"></i> Logs
+    </button>
+    <button class="btn btn-logout" onclick="logout()">
+      <i class="bi bi-box-arrow-right"></i> Sair
+    </button>
+  </div>
+</header>
+
+<!-- HAMBURGER + PAINEL -->
+<button class="nav-hamburger" id="navHamburger" onclick="toggleNavMenu()" title="Menu">
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+</button>
+
+<aside class="nav-panel" id="navPanel">
+  <div class="nav-panel-header">
+    <div class="nav-panel-title">
+      <i class="bi bi-compass"></i>
+      <span>Navegacao</span>
+    </div>
+    <button class="nav-panel-close" onclick="toggleNavMenu()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+ <nav class="nav-links">
+
+    <a href="dashboard.html" class="nav-link active">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Dashboard</div>
+        <div class="nav-link-desc">Visão Geral e KPIs</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="index.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Registro de Riscos</div>
+        <div class="nav-link-desc">Cadastro e análise</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="tratamento.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-shield-check"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Tratamento de Riscos</div>
+        <div class="nav-link-desc">Ações e planos de mitigação</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="referências.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-book-half"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Referências</div>
+        <div class="nav-link-desc">Guias e normativos</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+  </nav>
+
+  <div class="nav-panel-footer">
+    <span>Gestao de Riscos - TJPR</span>
+  </div>
+</aside>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNavMenu()"></div>
+
+<!-- MAIN -->
+<main class="main-area">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon"><i class="bi bi-graph-up-arrow"></i></div>
+      <div>
+        <h1 class="hero-title">Dashboard Executivo</h1>
+        <p class="hero-subtitle">
+          Visao consolidada de todos os riscos da instituicao
+          <span class="badge-live">
+            <span class="live-dot"></span> Atualizacao em tempo real
+          </span>
+        </p>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+    </div>
+  </section>
+
+  <!-- 🌡️ TERMÔMETRO DE EXPOSIÇÃO -->
+<section class="termometro-section" id="termometroSection">
+  <div class="termometro-header">
+    <div class="termometro-title">
+      <i class="bi bi-thermometer-half"></i>
+      <span>Exposição Global ao Risco</span>
+    </div>
+    <div class="termometro-badge" id="termometroBadge">
+      <span id="termometroLabel">SEM DADOS</span>
+    </div>
+  </div>
+
+  <div class="termometro-bar-container">
+    <div class="termometro-bar">
+      <div class="termometro-fill" id="termometroFill" style="width: 0%"></div>
+      <div class="termometro-pointer" id="termometroPointer" style="left: 0%">
+        <div class="pointer-value" id="termometroPercent">0%</div>
+      </div>
+    </div>
+    <div class="termometro-marks">
+      <span>0%</span>
+      <span>25%</span>
+      <span>50%</span>
+      <span>75%</span>
+      <span>100%</span>
+    </div>
+  </div>
+</section>
+<div class="divisao-filter-multi">
+  <label>
+    <i class="bi bi-diagram-3"></i> Divisões
+    <span id="divisaoLockIcon" style="display:none;color:var(--text-muted);margin-left:5px;" title="Somente gestores">
+      <i class="bi bi-lock-fill"></i>
+    </span>
+  </label>
+
+  <div class="chips-container" id="chipsDivisoes"></div>
+
+  <span id="divisaoAtualLabel" class="divisao-atual-label"></span>
+</div>
+
+<div class="dashboard-periodo-card">
+  <div class="periodo-header">
+    <div>
+      <h3><i class="bi bi-calendar3"></i> Período</h3>
+      <p>Filtre todos os indicadores por mês e ano</p>
+    </div>
+
+    <button type="button" class="btn-periodo-clear" onclick="limparFiltroMesAno()">
+      <i class="bi bi-x-circle"></i> Limpar meses
+    </button>
+  </div>
+
+  <div class="periodo-grid-meses" id="chipsMesesDashboard">
+    <!-- chips gerados pelo JS -->
+  </div>
+
+  <div class="periodo-ano-row">
+    <label>Ano</label>
+    <select id="filtroAnoGlobal" class="form-control-dark">
+      <option value="">Todos</option>
+    </select>
+  </div>
+
+  <div id="periodoResumo" class="periodo-resumo">
+    Período: <strong>Todos</strong>
+  </div>
+</div>
+<div id="barraFiltrosAtivos" class="barra-filtros-ativos" style="display:none;">
+  <span class="barra-filtros-label">
+    <i class="bi bi-funnel-fill"></i> Filtros ativos:
+  </span>
+  <div id="chipsFiltrosAtivos" class="chips-filtros-ativos"></div>
+  <button class="btn-limpar-filtros">
+    <i class="bi bi-x-circle"></i> Limpar tudo
+  </button>
+</div>
+  <!-- KPIs -->
+  <section class="kpi-row">
+  <!-- 1º Total de Riscos - AZUL -->
+  <div class="kpi-card kpi-total">
+    <div class="kpi-icon"><i class="bi bi-collection"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiTotalRiscos">0</div>
+      <div class="kpi-label">Total de Riscos</div>
+      <div class="kpi-comparativo" id="cmpTotal"></div>
+    </div>
+  </div>
+
+  <!-- 2º Planos de Tratamento - AMARELO -->
+  <div class="kpi-card kpi-medio">
+    <div class="kpi-icon"><i class="bi bi-clipboard-check"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiPlanos">0</div>
+      <div class="kpi-label">Planos de Tratamento</div>
+      <div class="kpi-comparativo" id="cmpTotal"></div>
+    </div>
+  </div>
+
+  <!-- 3º Planos Concluídos - VERDE -->
+  <div class="kpi-card kpi-baixo">
+    <div class="kpi-icon"><i class="bi bi-check2-circle"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiConcluidos">0</div>
+      <div class="kpi-label">Planos Concluídos</div>
+      <div class="kpi-comparativo" id="cmpTotal"></div>
+    </div>
+  </div>
+
+  <!-- 4º Planos em Atraso - VERMELHO PULSANTE -->
+  <div class="kpi-card kpi-alto" id="kpiCardAtraso">
+    <div class="kpi-icon"><i class="bi bi-alarm-fill"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiEmAtraso">0</div>
+      <div class="kpi-label">Planos em Atraso</div>
+      <div class="kpi-comparativo" id="cmpTotal"></div>
+    </div>
+  </div>
+</section>
+
+
+
+ <div class="panel-card matriz-dashboard-card">
+
+  <div class="matriz-header-dash">
+    <h2>
+      <i class="bi bi-grid-3x3-gap"></i>
+      Matriz de Risco
+    </h2>
+    <span class="badge-padrao-tjpr">Padrão TJPR</span>
+  </div>
+
+  <div class="matriz-layout-dash">
+
+    <div class="matriz-container-dash" id="matrizDashboard"></div>
+
+    <div class="matriz-kpis-lateral" id="resumoMatrizDashboard"></div>
+
+  </div>
+
+  <div class="matriz-legenda-dash">
+    <span class="legenda-titulo-dash">
+      <i class="bi bi-info-circle"></i>
+      Nível de risco
+    </span>
+
+    <div class="legenda-item-dash">
+      <span class="leg-tag-dash baixo">Baixo</span>
+      <span class="leg-range-dash">1 – 6</span>
+    </div>
+
+    <div class="legenda-item-dash">
+      <span class="leg-tag-dash medio">Médio</span>
+      <span class="leg-range-dash">7 – 19</span>
+    </div>
+
+    <div class="legenda-item-dash">
+      <span class="leg-tag-dash alto">Alto</span>
+      <span class="leg-range-dash">20 – 25</span>
+    </div>
+  </div>
+
+</div>
+
+  <!-- RANKINGS -->
+  <div class="row g-3 mb-3">
+    <div class="col-lg-6">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-bar-chart-fill"></i> Top 5 - Mais Riscos Detectados</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTopRiscos"></canvas>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-6">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-exclamation-triangle-fill"></i> Top 5 - Maior Risco Residual Medio</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartTopResidual"></canvas>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- DISTRIBUICOES -->
+  <div class="row g-3 mb-3">
+    <div class="col-lg-6">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-diagram-3-fill"></i> Riscos por Divisao</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartDivisoes"></canvas>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-3">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-shield-shaded"></i> Opcoes</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartOpcoes"></canvas>
+        </div>
+      </section>
+    </div>
+    <div class="col-lg-3">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-pie-chart-fill"></i> Nivel</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chartNivel"></canvas>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- INSIGHTS EXTRAS -->
+  <div class="row g-3 mb-3">
+    <div class="col-lg-4">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-clock-fill"></i> Vencendo em 7 dias</h2>
+          <span class="badge-info" id="badgeVencendo">0</span>
+        </div>
+        <div class="lista-insight" id="listaVencendo">
+          <div class="empty-mini">Nenhum vencendo em 7 dias</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-4">
+      <section class="panel-card h-100">
+        <div class="panel-card-header">
+          <h2><i class="bi bi-people-fill"></i> Top Responsaveis</h2>
+        </div>
+        <div class="lista-insight" id="listaResponsaveis">
+          <div class="empty-mini">Nenhum responsavel definido</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-lg-4">
+  <section class="panel-card h-100">
+    <div class="panel-card-header">
+      <h2><i class="bi bi-speedometer2"></i> Eficiência Global</h2>
+      <span class="badge-info" id="eficienciaLabel">SEM DADOS</span>
+    </div>
+
+    <div class="eficiencia-container" id="eficienciaContainer">
+      <!-- Gauge circular SVG -->
+      <div class="eficiencia-gauge-wrapper">
+        <svg class="eficiencia-svg" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80"
+                  fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="16"/>
+          <circle id="eficienciaCirculo" cx="100" cy="100" r="80"
+                  fill="none" stroke="#4dd0e1" stroke-width="16"
+                  stroke-linecap="round"
+                  stroke-dasharray="502.65" stroke-dashoffset="502.65"
+                  transform="rotate(-90 100 100)"
+                  style="transition: stroke-dashoffset 1s cubic-bezier(0.4,0,0.2,1), stroke 0.5s;"/>
+        </svg>
+        <div class="eficiencia-centro">
+          <div class="eficiencia-numero" id="eficienciaPct">0%</div>
+          <div class="eficiencia-sublabel">no prazo</div>
+        </div>
+      </div>
+
+      <!-- Mini stats -->
+      <div class="eficiencia-stats">
+        <div class="ef-stat ef-verde">
+          <div class="ef-stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+          <div class="ef-stat-info">
+            <div class="ef-stat-num" id="eficienciaNoPrazo">0</div>
+            <div class="ef-stat-label">No prazo</div>
+          </div>
+        </div>
+        <div class="ef-stat ef-vermelho">
+          <div class="ef-stat-icon"><i class="bi bi-x-circle-fill"></i></div>
+          <div class="ef-stat-info">
+            <div class="ef-stat-num" id="eficienciaAtrasados">0</div>
+            <div class="ef-stat-label">Fora do prazo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="eficienciaEmpty" class="empty-mini" style="display:none;">
+      <i class="bi bi-speedometer"></i>
+      Ainda não há tratamentos concluídos
+      <div style="font-size:11px; margin-top:6px; opacity:0.8;">
+        Complete um tratamento para ver a eficiência
+      </div>
+    </div>
+  </section>
+</div>
+  </div>
+
+</main>
+
+<!-- MODAL LOGS -->
+<div class="modal-overlay" id="modalLogs" style="display:none;">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <h2><i class="bi bi-journal-text"></i> Timeline de Acoes</h2>
+      <button class="modal-close" onclick="fecharModalLogs()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="timeline-container" id="logsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-export" onclick="exportarLogs()"><i class="bi bi-download"></i> Baixar TXT</button>
+      <button class="btn btn-cancel" onclick="fecharModalLogs()"><i class="bi bi-x-circle"></i> Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+<div id="confetti-container"></div>
+
+<script>
+  window.addEventListener("load", function() {
+    const MAPA = {
+      "DA":"Divisao Administrativa","DC":"Divisao de Calculos",
+      "DPP":"Divisao de Pagamento de Precatorios","CJ":"Consultoria Juridica",
+      "AA":"Assessoria de Atendimento","AT":"Assessoria Tecnica",
+      "DCGA":"Divisao de Controle e Gestao de Aportes"
+    };
+    setTimeout(function() {
+      const u = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+      const sigla = String(u.divisao || "").trim().toUpperCase();
+      const heroEl = document.getElementById("heroDivision");
+      if (heroEl) heroEl.textContent = MAPA[sigla] || sigla || "-";
+    }, 100);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="assets/js/riscos.js"></script>
+<script src="assets/js/dashboard.js"></script>
+<script src="assets/js/backup.js"></script>
+<!-- MODAL BACKUP -->
+<div class="modal-overlay" id="modalBackup" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="bi bi-cloud-arrow-down-fill"></i> Backup & Restauração</h2>
+      <button class="modal-close" onclick="fecharModalBackup()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- STATUS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-clock-history"></i> Último Backup</h4>
+        <div id="statusUltimoBackup" class="backup-status">Verificando...</div>
+      </div>
+
+      <!-- EXPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-download"></i> Exportar Backup</h4>
+        <p class="backup-desc">Baixa um arquivo <strong>.json</strong> com todos os seus dados: processos, riscos, tratamentos e logs.</p>
+        <button class="btn-backup-primary" onclick="exportarBackup()">
+          <i class="bi bi-cloud-arrow-down-fill"></i> Exportar TUDO
+        </button>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-upload"></i> Importar Backup</h4>
+        <p class="backup-desc">Restaura dados de um arquivo <strong>.json</strong> exportado anteriormente.</p>
+        <button class="btn-backup-secondary" onclick="abrirSeletorArquivoBackup()">
+          <i class="bi bi-cloud-arrow-up-fill"></i> Selecionar arquivo...
+        </button>
+        <input type="file" id="inputArquivoBackup" accept=".json,application/json" style="display:none;" onchange="processarArquivoBackup(event)">
+      </div>
+
+      <!-- ESTATÍSTICAS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-bar-chart-line"></i> Estatísticas</h4>
+        <div id="estatisticasBackup" class="backup-stats">Carregando...</div>
+      </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div class="backup-secao backup-danger">
+        <h4><i class="bi bi-exclamation-triangle-fill"></i> Zona de Perigo</h4>
+        <p class="backup-desc">Ação irreversível. Faça backup antes.</p>
+        <button class="btn-backup-danger" onclick="limparTodosDados()">
+          <i class="bi bi-trash-fill"></i> Apagar TODOS os dados
+        </button>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalBackup()">
+        <i class="bi bi-x-circle"></i> Fechar
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

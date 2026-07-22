@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestão de Riscos - SEPREC</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/css/riscos.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1929'/><path d='M50 15L20 28v22c0 20 13 37 30 42 17-5 30-22 30-42V28L50 15z' fill='%233ad48a' stroke='%234dd0e1' stroke-width='2'/><path d='M50 40v18M50 65v6' stroke='%230a1929' stroke-width='6' stroke-linecap='round'/></svg>">
+  <script src="assets/js/auth.js"></script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+             <script src="assets/js/supabase-client.js"></script>
+</head>
+<body>
+<script>
+   console.log("Pathname:", window.location.pathname);
+console.log("Href:", window.location.href);
+</script>
+<!-- HEADER -->
+<header class="top-header d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center gap-3">
+    <img src="assets/img/logo-tjpr.png" alt="TJPR" class="header-logo">
+    <div class="app-title-mini">
+      <div class="app-name">Registro de Riscos</div>
+      <div class="app-desc">Gestão de Riscos - TJPR</div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2">
+    <div class="user-badge">
+      <div class="user-avatar" id="userAvatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Carregando...</div>
+        <div class="user-division">
+          <i class="bi bi-diagram-3"></i>
+          <span id="userDivision">--</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-icon" onclick="toggleSom()" id="btnSom" title="Ativar/desativar sons">
+      <i class="bi bi-volume-up-fill" id="iconSom"></i>
+    </button>
+
+    <button class="btn btn-icon" onclick="toggleTheme()" id="btnTheme" title="Alternar tema">
+      <i class="bi bi-moon-stars-fill" id="iconTheme"></i>
+    </button>
+
+    <button class="btn btn-clear-filter" id="btnLimparFiltro" onclick="limparFiltroRisco()" style="display:none;">
+  <i class="bi bi-funnel-fill"></i> <span id="labelFiltro">Filtro Ativo</span>
+</button>
+
+<button class="btn btn-logs" onclick="abrirModalLogs()">
+  <i class="bi bi-journal-text"></i> Logs
+</button>
+<button class="btn btn-logout" onclick="logout()">
+  <i class="bi bi-box-arrow-right"></i> Sair
+</button>
+  </div>
+</header>
+
+<!-- ============ BOTÃO HAMBURGER FLUTUANTE ============ -->
+<button class="nav-hamburger" id="navHamburger" onclick="toggleNavMenu()" title="Menu de navegação">
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+</button>
+
+<!-- ============ PAINEL DE NAVEGAÇÃO LATERAL ============ -->
+<aside class="nav-panel" id="navPanel">
+  <div class="nav-panel-header">
+    <div class="nav-panel-title">
+      <i class="bi bi-compass"></i>
+      <span>Navegação</span>
+    </div>
+    <button class="nav-panel-close" onclick="toggleNavMenu()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <nav class="nav-links">
+
+    <a href="dashboard.html" class="nav-link" id="linkDashboard">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Dashboard</div>
+        <div class="nav-link-desc">Visão Geral e KPIs</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="index.html" class="nav-link active">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Registro de Riscos</div>
+        <div class="nav-link-desc">Cadastro e análise</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="tratamento.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-shield-check"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Tratamento de Riscos</div>
+        <div class="nav-link-desc">Ações e planos de mitigação</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="referências.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-book-half"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Referências</div>
+        <div class="nav-link-desc">Guias e normativos</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+  </nav>
+
+  <div class="nav-panel-footer">
+    <span>Gestão de Riscos • TJPR</span>
+  </div>
+</aside>
+
+<!-- Overlay escuro atrás do menu -->
+<div class="nav-overlay" id="navOverlay" onclick="toggleNavMenu()"></div>
+<main class="main-area">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon"><i class="bi bi-shield-shaded"></i></div>
+      <div>
+        <h1 class="hero-title">Registro de Riscos</h1>
+        <p class="hero-subtitle">
+          Você editará os dados da sua divisão:
+          <span class="division-highlight" id="heroDivision">--</span>
+        </p>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+    </div>
+  </section>
+
+  <!-- TERMÔMETRO DE EXPOSIÇÃO -->
+  <section class="termometro-section" id="termometroSection">
+    <div class="termometro-header">
+      <div class="termometro-title">
+        <i class="bi bi-thermometer-half"></i>
+        <span>Exposição ao Risco</span>
+      </div>
+      <div class="termometro-badge" id="termometroBadge">
+        <span id="termometroLabel">SEM DADOS</span>
+      </div>
+    </div>
+
+    <div class="termometro-bar-container">
+      <div class="termometro-bar">
+        <div class="termometro-fill" id="termometroFill" style="width: 0%"></div>
+        <div class="termometro-pointer" id="termometroPointer" style="left: 0%">
+          <div class="pointer-value" id="termometroPercent">0%</div>
+        </div>
+      </div>
+
+      <div class="termometro-marks">
+        <span>0%</span>
+        <span>25%</span>
+        <span>50%</span>
+        <span>75%</span>
+        <span>100%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpi-row">
+    <div class="kpi-card kpi-total">
+      <div class="kpi-icon"><i class="bi bi-collection"></i></div>
+      <div class="kpi-info">
+        <div class="kpi-number" id="kpiTotal">0</div>
+        <div class="kpi-label">Total de Riscos</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-alto">
+      <div class="kpi-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
+      <div class="kpi-info">
+        <div class="kpi-number" id="kpiAlto">0</div>
+        <div class="kpi-label">Riscos Altos</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-medio">
+      <div class="kpi-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="kpi-info">
+        <div class="kpi-number" id="kpiMedio">0</div>
+        <div class="kpi-label">Riscos Médios</div>
+      </div>
+    </div>
+    <div class="kpi-card kpi-baixo">
+      <div class="kpi-icon"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="kpi-info">
+        <div class="kpi-number" id="kpiBaixo">0</div>
+        <div class="kpi-label">Riscos Baixos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SELETOR DE REGISTRO -->
+  <section class="panel-card" id="secRegistro">
+    
+    <div class="panel-card-header">
+      <h2><i class="bi bi-folder2-open"></i> Registro Atual</h2>
+      <div class="header-actions">
+        <button class="btn btn-export-pdf" onclick="exportarRegistroPDF()" id="btnPDF" disabled>
+          <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </button>
+        <button class="btn btn-new-registro" onclick="abrirModalProcesso()">
+          <i class="bi bi-plus-circle-fill"></i> Novo Registro
+        </button>
+        <button class="btn btn-edit-registro" onclick="abrirModalProcesso(processoAtualId)" id="btnEditReg" disabled>
+          <i class="bi bi-pencil-square"></i> Editar
+        </button>
+        <button class="btn btn-del-registro" onclick="excluirProcesso(processoAtualId)" id="btnDelReg" disabled>
+          <i class="bi bi-trash"></i> Excluir
+        </button>
+      </div>
+    </div>
+ <div class="divisao-filter">
+  <label>
+    <i class="bi bi-diagram-3"></i> Divisão
+    <span id="divisaoLockIcon" style="display:none;color:var(--accent-yellow, #f5c94a);margin-left:5px;"
+          title="Somente gestores podem alterar a divisão">
+      <i class="bi bi-lock-fill"></i>
+    </span>
+  </label>
+  <select id="filtroDivisao" class="form-control-dark">
+    <option value="">Todas</option>
+    <option value="AT">AT — Assessoria Técnica</option>
+    <option value="AA">AA — Assessoria de Atendimento</option>
+    <option value="DA">DA — Divisão Administrativa</option>
+    <option value="DC">DC — Divisão de Cálculos</option>
+    <option value="DPP">DPP — Divisão Pagamento Precatórios</option>
+    <option value="CJ">CJ — Consultoria Jurídica</option>
+    <option value="DCGA">DCGA — Divisão de Controle e Gestão de Aportes</option>
+  </select>
+  <span id="divisaoAtualLabel" class="divisao-atual-label"></span>
+</div>
+    <div class="registro-selector">
+      <label>Selecione um registro (processo de trabalho):</label>
+      <select id="seletorProcesso" class="form-control-dark" onchange="selecionarProcesso(this.value)">
+        <option value="">-- Nenhum registro criado ainda --</option>
+      </select>
+    </div>
+
+     <!-- LINHA 1 -->
+    <div class="registro-info" id="registroInfo" style="display:none;">
+  <div class="info-grid">
+    <!-- LINHA 1 -->
+    <div class="info-item" data-pos="1">
+      <span class="info-label">
+        <i class="bi bi-building"></i> Unidade
+        <i class="bi bi-info-circle-fill info-tip" title="Nome da unidade/setor responsável pelo processo"></i>
+      </span>
+      <span class="info-value" id="infoUnidade">—</span>
+    </div>
+
+    <div class="info-item" data-pos="2">
+      <span class="info-label">
+        <i class="bi bi-diagram-2"></i> Processo
+        <i class="bi bi-info-circle-fill info-tip" title="Nome do processo de trabalho analisado"></i>
+      </span>
+      <span class="info-value" id="infoProcesso">—</span>
+    </div>
+
+    <div class="info-item" data-pos="3">
+      <span class="info-label">
+        <i class="bi bi-bullseye"></i> Objetivo
+        <i class="bi bi-info-circle-fill info-tip" title="O que se espera alcançar com este processo"></i>
+      </span>
+      <span class="info-value" id="infoObjetivo">—</span>
+    </div>
+
+    <div class="info-item" data-pos="4">
+      <span class="info-label">
+        <i class="bi bi-signpost-split"></i> Macroprocesso
+        <i class="bi bi-info-circle-fill info-tip" title="Macroprocesso institucional — fixado como 'Prestar Jurisdição'"></i>
+      </span>
+      <span class="info-value">
+        <div class="campo-fixo-display">
+          <i class="bi bi-lock-fill"></i>
+          <span>Prestar Jurisdição</span>
+        </div>
+      </span>
+    </div>
+
+    <!-- LINHA 2 -->
+    <div class="info-item" data-pos="5">
+      <span class="info-label">
+        <i class="bi bi-flag-fill"></i> Resultado
+        <i class="bi bi-info-circle-fill info-tip" title="Resultado esperado — produto, decisão ou entrega gerada"></i>
+      </span>
+      <span class="info-value" id="infoResultado">—</span>
+    </div>
+
+    <div class="info-item" data-pos="6">
+      <span class="info-label">
+        <i class="bi bi-people-fill"></i> Clientes / Demandantes
+        <i class="bi bi-info-circle-fill info-tip" title="Quem solicita ou recebe o resultado do processo"></i>
+      </span>
+      <span class="info-value" id="infoClientes">—</span>
+    </div>
+
+    <div class="info-item" data-pos="7">
+      <span class="info-label">
+        <i class="bi bi-diagram-3"></i> Áreas Envolvidas
+        <i class="bi bi-info-circle-fill info-tip" title="Setores/divisões que participam do processo"></i>
+      </span>
+      <span class="info-value" id="infoAreas">—</span>
+    </div>
+
+    <div class="info-item" data-pos="8">
+      <span class="info-label">
+        <i class="bi bi-calendar"></i> Data
+      </span>
+      <span class="info-value" id="infoData">—</span>
+    </div>
+
+    <!-- LINHA 3 -->
+    <div class="info-item" data-pos="9">
+      <span class="info-label">
+        <i class="bi bi-image"></i> Anexos
+      </span>
+      <span class="info-value">
+        <button class="btn-ver-anexos" id="btnVerAnexos" onclick="abrirModalAnexos()" style="display:none;">
+          <i class="bi bi-eye-fill"></i> Ver <span id="qtdAnexos">0</span>
+        </button>
+        <span id="semAnexos" style="color:var(--text-muted);font-size:12px;">—</span>
+      </span>
+    </div>
+
+  </div>
+</div>
+
+    <div id="emptyRegistro" class="empty-registro">
+      <i class="bi bi-folder-plus"></i>
+      <h3>Nenhum registro criado ainda</h3>
+      <p>Clique em <strong>+ Novo Registro</strong> para começar. Cada registro representa um processo de trabalho da sua divisão.</p>
+    </div>
+  </section>
+
+  <!-- TABELA -->
+  <section class="panel-card" id="secTabela">
+    <div class="panel-card-header">
+      <h2><i class="bi bi-table"></i> Riscos Identificados</h2>
+      <button class="btn btn-new-risk" onclick="abrirModalRisco()">
+        <i class="bi bi-plus-circle-fill"></i> Novo Risco
+      </button>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="tabela-riscos">
+        <thead>
+          <tr>
+            <th rowspan="2">Registro 
+            </th>
+            <th colspan="3">Riscos Identificados</th>
+            <th colspan="3">Análise</th>
+            <th colspan="2">Controles Gerenciais</th>
+            <th rowspan="2">Risco<br>Residual</th>
+            <th colspan="2">Recomendação</th>
+            <th rowspan="2">Ações</th>
+          </tr>
+          <tr>
+            <th>Evento</th><th>Causa</th><th>Consequência</th>
+            <th>Prob.</th><th>Imp.</th><th>Nível</th>
+            <th>Descrição</th><th>Nível</th>
+            <th>Tratar?</th><th>Prioritário?</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody"></tbody>
+      </table>
+
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+        <h3>Nenhum risco registrado ainda</h3>
+        <p>Clique em <strong>Novo Risco</strong> para começar a mapear os riscos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATRIZ -->
+  <section class="panel-card" id="secMatriz">
+    <div class="panel-card-header">
+      <h2><i class="bi bi-grid-3x3"></i> Matriz de Risco</h2>
+      <span class="badge-info">Padrão TJPR</span>
+    </div>
+
+    <div class="matriz-com-legenda">
+      <div class="matriz-container">
+        <div class="matriz-y-axis"><span class="axis-label">IMPACTO</span></div>
+        <div class="matriz-wrapper">
+          <div class="matriz-y-labels">
+            <div class="label-box">Muito Alto</div>
+            <div class="label-box">Alto</div>
+            <div class="label-box">Médio</div>
+            <div class="label-box">Baixo</div>
+            <div class="label-box">Muito Baixo</div>
+          </div>
+          <div class="matriz-grid" id="matrizGrid"></div>
+        </div>
+        <div class="matriz-x-labels">
+          <span></span>
+          <div class="label-box">Raro</div>
+          <div class="label-box">Pouco Provável</div>
+          <div class="label-box">Provável</div>
+          <div class="label-box">Muito Provável</div>
+          <div class="label-box">Quase Certo</div>
+        </div>
+        <div class="matriz-x-axis"><span class="axis-label">PROBABILIDADE</span></div>
+      </div>
+    </div>
+
+    <div class="legenda-horizontal">
+      <div class="lh-header">Nível de Risco</div>
+      <div class="lh-item"><span class="lh-chip lc-baixo">Baixo</span><span class="lh-range">1 - 6</span></div>
+      <div class="lh-item"><span class="lh-chip lc-medio">Médio</span><span class="lh-range">7 - 19</span></div>
+      <div class="lh-item"><span class="lh-chip lc-alto">Alto</span><span class="lh-range">20 - 25</span></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL RISCO -->
+<div class="modal-overlay" id="modalRisco" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalTitle"><i class="bi bi-plus-circle"></i> Novo Risco</h2>
+      <button class="modal-close" onclick="fecharModal()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="riscoId">
+      <div class="form-section">
+        <h4><i class="bi bi-exclamation-diamond"></i> Riscos Identificados</h4>
+        <div class="row g-3">
+          <div class="col-md-4"><label>Evento *</label><textarea id="rEvento" class="form-control-dark" rows="2"></textarea></div>
+<div class="col-md-4">
+  <label class="label-group">Causa *</label>
+  <div class="sub-fields">
+    <div class="sub-field">
+      <label class="sub-label">Fonte</label>
+      <select id="rFonte" class="form-control-dark">
+        <option value="">Selecione...</option>
+        <option value="Pessoas">Pessoas</option>
+        <option value="Processos">Processos</option>
+        <option value="Sistemas">Sistemas</option>
+        <option value="Infraestrutura Física">Infraestrutura Física</option>
+        <option value="Infraestrutura Organizacional">Infraestrutura Organizacional</option>
+        <option value="Tecnologia">Tecnologia</option>
+        <option value="Eventos Externos">Eventos Externos (não gerenciáveis)</option>
+      </select>
+    </div>
+    <div class="sub-field">
+      <label class="sub-label">Vulnerabilidade</label>
+      <select id="rVulnerabilidade" class="form-control-dark">
+        <option value="">Selecione...</option>
+        <option value="Inexistência">Inexistência</option>
+        <option value="Inadequação">Inadequação</option>
+        <option value="Deficiência">Deficiência</option>
+      </select>
+    </div>
+  </div>
+</div>          <div class="col-md-4"><label>Consequência *</label><textarea id="rConsequencia" class="form-control-dark" rows="2"></textarea></div>
+        </div>
+      </div>
+      <div class="form-section">
+        <h4><i class="bi bi-graph-up"></i> Análise</h4>
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label>Probabilidade (1-5) *</label>
+            <select id="rProb" class="form-control-dark" onchange="calcularNivelPreview()">
+              <option value="">Selecione...</option>
+              <option value="1">1 - Raro</option>
+              <option value="2">2 - Pouco Provável</option>
+              <option value="3">3 - Provável</option>
+              <option value="4">4 - Muito Provável</option>
+              <option value="5">5 - Quase Certo</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label>Impacto (1-5) *</label>
+            <select id="rImp" class="form-control-dark" onchange="calcularNivelPreview()">
+              <option value="">Selecione...</option>
+              <option value="1">1 - Muito Baixo</option>
+              <option value="2">2 - Baixo</option>
+              <option value="3">3 - Médio</option>
+              <option value="4">4 - Alto</option>
+              <option value="5">5 - Muito Alto</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <div class="preview-nivel">
+              <span class="preview-label">Nível de Risco</span>
+              <div class="preview-value" id="previewNivel">
+                <span class="nivel-num">0</span>
+                <span class="nivel-badge badge-baixo">Baixo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <h4><i class="bi bi-shield-check"></i> Controles Gerenciais</h4>
+        <div class="row g-3">
+          <div class="col-md-8"><label>Descrição do Controle</label><textarea id="rDescControle" class="form-control-dark" rows="2"></textarea></div>
+          <div class="col-md-4">
+            <label>Nível do Controle</label>
+            <select id="rNivelControle" class="form-control-dark" onchange="verificarJustificativa()">
+              <option value="1">Fraco = 1</option>
+              <option value="0.75">Médio = 0.75</option>
+              <option value="0.5">Alto = 0.5</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-section">
+        <h4><i class="bi bi-clipboard-check"></i> Recomendação</h4>
+        <div class="row g-3">
+<div class="col-md-6">
+  <label>Tratar?</label>
+  <select id="rTratar" class="form-control-dark" onchange="verificarJustificativa()">
+    <option value="Sim">Sim</option>
+    <option value="Não">Não</option>
+  </select>
+
+  <!-- 🆕 Campo de justificativa que aparece quando alto risco + Não -->
+  <div id="justificativaBox" class="justificativa-box" style="display:none;">
+    <label class="justificativa-label">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      Justificativa Obrigatória *
+    </label>
+    <p class="justificativa-hint">
+      Este risco tem <strong>Residual Alto</strong>. Explique por que não precisa de tratamento:
+    </p>
+    <textarea id="rJustificativa" class="form-control-dark" rows="3"
+              placeholder="Ex: Risco assumido pelo gestor conforme análise custo-benefício. Baixa probabilidade de materialização..."></textarea>
+  </div>
+</div>          
+
+          <div class="col-md-6"><label>Prioritário?</label><select id="rPrioritario" class="form-control-dark"><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModal()"><i class="bi bi-x-circle"></i> Cancelar</button>
+      <button class="btn btn-save" onclick="salvarRisco()"><i class="bi bi-check-circle-fill"></i> Salvar Risco</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PROCESSO -->
+<div class="modal-overlay" id="modalProcesso" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="modalProcessoTitle"><i class="bi bi-folder-plus"></i> Novo Registro</h2>
+      <button class="modal-close" onclick="fecharModalProcesso()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+      <input type="hidden" id="processoId">
+
+      <div class="form-section">
+        <h4><i class="bi bi-info-circle"></i> Informações do Registro</h4>
+
+        <div class="row g-3">
+         <div class="col-md-12">
+  <label>
+    Unidade *
+    <i class="bi bi-info-circle-fill info-tip"
+       title="Unidade responsável pelo registro. Gestores podem escolher qualquer uma; usuários comuns têm a sua pré-selecionada."></i>
+  </label>
+  <select id="pUnidade" class="form-control-dark">
+    <option value="">Selecione...</option>
+    <option value="AT">AT — Assessoria Técnica</option>
+    <option value="AA">AA — Assessoria de Atendimento</option>
+    <option value="DA">DA — Divisão Administrativa</option>
+    <option value="DC">DC — Divisão de Cálculos</option>
+    <option value="DPP">DPP — Divisão Pagamento Precatórios</option>
+    <option value="CJ">CJ — Consultoria Jurídica</option>
+    <option value="DCGA">DCGA — Div. Controle e Gestão de Aportes</option>
+  </select>
+</div>
+          <div class="col-md-12">
+  <label>
+    Processo de Trabalho *
+    <i class="bi bi-info-circle-fill info-tip"
+       title="Nome do processo de trabalho analisado"></i>
+  </label>
+  <textarea id="pProcesso" class="form-control-dark"
+            rows="3"
+            placeholder="Ex: Análise de Precatórios"></textarea>
+</div>
+
+          <div class="col-12">
+            <label>
+              Objetivo *
+              <i class="bi bi-info-circle-fill info-tip"
+                 title="O que se espera alcançar com este processo — finalidade principal"></i>
+            </label>
+            <textarea id="pObjetivo" class="form-control-dark" rows="2" placeholder="Descreva o objetivo do processo"></textarea>
+          </div>
+
+          <div class="col-12">
+            <label>
+              Resultado
+              <i class="bi bi-info-circle-fill info-tip"
+                 title="Resultado esperado ao final — produto, decisão ou entrega gerada"></i>
+            </label>
+            <textarea id="pResultado" class="form-control-dark" rows="2" placeholder="Ex: Precatório emitido e publicado no diário oficial"></textarea>
+          </div>
+
+          <div class="col-md-6">
+            <label>
+              Clientes / Demandantes
+              <i class="bi bi-info-circle-fill info-tip"
+                 title="Quem solicita ou recebe o resultado (magistrados, credores, servidores, órgãos externos etc.)"></i>
+            </label>
+            <input type="text" id="pClientes" class="form-control-dark" placeholder="Ex: Magistrados, credores, órgãos externos">
+          </div>
+
+          <div class="col-md-6">
+  <label>
+    Áreas Envolvidas
+    <i class="bi bi-info-circle-fill info-tip"
+       title="Setores/divisões que participam do processo — marque todas que se aplicam"></i>
+  </label>
+
+  <div class="multi-select-wrap">
+    <button type="button" class="form-control-dark multi-select-toggle"
+            id="pAreasToggle" onclick="toggleDropdownAreas()">
+      <span id="pAreasLabel">Selecione as áreas...</span>
+      <i class="bi bi-chevron-down"></i>
+    </button>
+
+    <div class="multi-select-dropdown" id="pAreasDropdown" style="display:none;">
+      <label class="multi-opt"><input type="checkbox" value="AT">   <span>AT — Assessoria Técnica</span></label>
+      <label class="multi-opt"><input type="checkbox" value="DA">   <span>DA — Divisão Administrativa</span></label>
+      <label class="multi-opt"><input type="checkbox" value="DC">   <span>DC — Divisão de Cálculos</span></label>
+      <label class="multi-opt"><input type="checkbox" value="DPP">  <span>DPP — Divisão de Pagamento de Precatórios</span></label>
+      <label class="multi-opt"><input type="checkbox" value="CJ">   <span>CJ — Consultoria Jurídica</span></label>
+      <label class="multi-opt"><input type="checkbox" value="CA">   <span>AA — Assessoria de Atendimento</span></label>
+      <label class="multi-opt"><input type="checkbox" value="DCGA"> <span>DCGA — Divisão de Controle e Gestão de Aportes</span></label>
+    </div>
+
+    <input type="hidden" id="pAreas">
+  </div>
+</div>
+
+          <div class="col-md-8">
+  <label>
+    Macroprocesso da Cadeia de Valor
+    <i class="bi bi-info-circle-fill info-tip"
+       title="Macroprocesso institucional — valor fixo para todos os registros"></i>
+  </label>
+
+  <div class="campo-fixo-display">
+    <i class="bi bi-lock-fill"></i>
+    <span>Prestar Jurisdição</span>
+  </div>
+
+  <input type="hidden" id="pMacroprocesso" value="Prestar Jurisdição">
+</div>
+
+          <div class="col-md-4">
+            <label>Data</label>
+            <input type="date" id="pData" class="form-control-dark">
+          </div>
+
+          <!-- BLOCO DE FLUXOGRAMAS -->
+          <div class="col-12" style="margin-top: 15px;">
+            <label>
+              Mapas do Processo
+              <i class="bi bi-info-circle-fill info-tip"
+                 title="Anexe organogramas, fluxogramas ou documentos ilustrativos"></i>
+              <span class="label-hint">(até 3 arquivos — PDF, PNG ou JPG, máx. 2MB cada)</span>
+            </label>
+            <div id="organogramasContainer" class="upload-list"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalProcesso()">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </button>
+      <button class="btn btn-save" onclick="salvarProcesso()">
+        <i class="bi bi-check-circle-fill"></i> Salvar Registro
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LOGS -->
+<div class="modal-overlay" id="modalLogs" style="display:none;">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <h2><i class="bi bi-journal-text"></i> Timeline de Ações</h2>
+      <button class="modal-close" onclick="fecharModalLogs()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="timeline-container" id="logsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-export" onclick="exportarLogs()"><i class="bi bi-download"></i> Baixar TXT</button>
+      <button class="btn btn-cancel" onclick="fecharModalLogs()"><i class="bi bi-x-circle"></i> Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+<div id="confetti-container"></div>
+
+<!-- MODAL DE ANEXOS -->
+<div class="modal-overlay" id="modalAnexos" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="bi bi-images"></i> Fluxogramas do Registro</h2>
+      <button class="modal-close" onclick="fecharModalAnexos()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="listaAnexos" class="anexos-grid"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalAnexos()"><i class="bi bi-x-circle"></i> Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nome completo divisão -->
+<script>
+  window.addEventListener("load", function() {
+    const MAPA = {
+      "DA":"Divisão Administrativa","DC":"Divisão de Cálculos",
+      "DPP":"Divisão de Pagamento de Precatórios","CJ":"Consultoria Jurídica",
+      "AA":"Assessoria de Atendimento","AT":"Assessoria Técnica",
+      "DCGA":"Divisão de Controle e Gestão de Aportes"
+    };
+    setTimeout(function() {
+      const u = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+      const sigla = String(u.divisao || "").trim().toUpperCase();
+      const heroEl = document.getElementById("heroDivision");
+      if (heroEl) heroEl.textContent = MAPA[sigla] || sigla || "—";
+    }, 100);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="assets/js/riscos.js"></script>
+<script src="assets/js/backup.js"></script>
+<!-- MODAL BACKUP -->
+<div class="modal-overlay" id="modalBackup" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="bi bi-cloud-arrow-down-fill"></i> Backup & Restauração</h2>
+      <button class="modal-close" onclick="fecharModalBackup()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- STATUS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-clock-history"></i> Último Backup</h4>
+        <div id="statusUltimoBackup" class="backup-status">Verificando...</div>
+      </div>
+
+      <!-- EXPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-download"></i> Exportar Backup</h4>
+        <p class="backup-desc">Baixa um arquivo <strong>.json</strong> com todos os seus dados: processos, riscos, tratamentos e logs.</p>
+        <button class="btn-backup-primary" onclick="exportarBackup()">
+          <i class="bi bi-cloud-arrow-down-fill"></i> Exportar TUDO
+        </button>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-upload"></i> Importar Backup</h4>
+        <p class="backup-desc">Restaura dados de um arquivo <strong>.json</strong> exportado anteriormente.</p>
+        <button class="btn-backup-secondary" onclick="abrirSeletorArquivoBackup()">
+          <i class="bi bi-cloud-arrow-up-fill"></i> Selecionar arquivo...
+        </button>
+        <input type="file" id="inputArquivoBackup" accept=".json,application/json" style="display:none;" onchange="processarArquivoBackup(event)">
+      </div>
+
+      <!-- ESTATÍSTICAS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-bar-chart-line"></i> Estatísticas</h4>
+        <div id="estatisticasBackup" class="backup-stats">Carregando...</div>
+      </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div class="backup-secao backup-danger">
+        <h4><i class="bi bi-exclamation-triangle-fill"></i> Zona de Perigo</h4>
+        <p class="backup-desc">Ação irreversível. Faça backup antes.</p>
+        <button class="btn-backup-danger" onclick="limparTodosDados()">
+          <i class="bi bi-trash-fill"></i> Apagar TODOS os dados
+        </button>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalBackup()">
+        <i class="bi bi-x-circle"></i> Fechar
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

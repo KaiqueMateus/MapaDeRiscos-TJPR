@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Supabase</title>
+  <style>
+    body { background:#0a1929; color:#e6f1f5; font-family:'Segoe UI',sans-serif; padding:40px; max-width:900px; margin:0 auto; }
+    h1 { color:#4dd0e1; }
+    .box { background:#122c40; border:1px solid rgba(120,200,210,0.2); border-radius:10px; padding:20px; margin:15px 0; }
+    .box h3 { margin-top:0; color:#4dd0e1; }
+    label { display:block; margin-top:12px; color:#9fb7c1; font-size:13px; font-weight:600; }
+    small { display:block; color:#6b7d8f; font-size:11px; margin-bottom:4px; font-style:italic; }
+    input { background:rgba(255,255,255,0.05); border:1px solid rgba(120,200,210,0.3); color:#e6f1f5; padding:10px 12px; border-radius:6px; width:100%; font-family:monospace; font-size:12px; box-sizing:border-box; }
+    input:focus { outline:none; border-color:#4dd0e1; }
+    button { background:linear-gradient(135deg,#4dd0e1,#3a8fd8); color:#0a1929; border:none; padding:10px 20px; border-radius:8px; font-weight:700; cursor:pointer; margin:10px 5px 5px 0; }
+    button:hover { transform:translateY(-2px); }
+    pre { background:rgba(0,0,0,0.4); padding:12px; border-radius:6px; font-size:13px; white-space:pre-wrap; color:#3ad48a; margin:10px 0 0; line-height:1.5; max-height:400px; overflow-y:auto; }
+    .erro { color:#e05a5a; }
+    .sucesso { color:#3ad48a; }
+    .aviso { color:#f5c94a; }
+  </style>
+</head>
+<body>
+
+<h1>🧪 Teste de Conexão Supabase</h1>
+
+<div class="box">
+  <h3>1️⃣ Credenciais</h3>
+  <label>Project URL:</label>
+  <input id="url" placeholder="https://xxx.supabase.co">
+  <small>URL do projeto (sem /rest/v1/)</small>
+
+  <label>API Key:</label>
+  <input id="key" placeholder="sb_publishable_... ou eyJhbGci...">
+  <small>Aceita AMBOS formatos: novo (sb_publishable_) ou antigo (eyJ)</small>
+
+  <button onclick="conectar()">🔌 Conectar</button>
+</div>
+
+<div class="box">
+  <h3>2️⃣ Status</h3>
+  <pre id="status">Aguardando conexão...</pre>
+</div>
+
+<div class="box">
+  <h3>3️⃣ Testes</h3>
+  <button onclick="testarTabelas()">📋 Listar tabelas</button>
+  <button onclick="testarUsuarios()">👥 Ver usuários</button>
+  <button onclick="testarInsert()">➕ Inserir teste</button>
+  <button onclick="testarLimpar()">🗑️ Limpar</button>
+  <pre id="resultado">Escolha um teste acima...</pre>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+let sb = null;
+
+function log(el, msg, cls) {
+  const c = cls ? ' class="'+cls+'"' : '';
+  document.getElementById(el).innerHTML = '<span'+c+'>'+msg+'</span>';
+}
+
+async function conectar() {
+  let url = document.getElementById("url").value.trim();
+  const key = document.getElementById("key").value.trim();
+
+  // Auto-remove /rest/v1/ do fim
+  url = url.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "");
+
+  if (!url || !key) {
+    log("status", "❌ Preencha URL e API Key!", "erro");
+    return;
+  }
+
+  if (!url.includes(".supabase.co")) {
+    log("status", "❌ URL inválida! Deve terminar em .supabase.co", "erro");
+    return;
+  }
+
+  // Aceita AMBOS formatos de chave
+  const isJWT = key.startsWith("eyJ");
+  const isNovo = key.startsWith("sb_publishable_") || key.startsWith("sb_secret_");
+
+  if (!isJWT && !isNovo) {
+    log("status",
+      "❌ API Key parece inválida!\n\n" +
+      "Formatos aceitos:\n" +
+      "  • sb_publishable_... (novo)\n" +
+      "  • sb_secret_... (novo secret)\n" +
+      "  • eyJhbGci... (JWT antigo)\n\n" +
+      "Vai em: Settings → API",
+      "erro");
+    return;
+  }
+
+  try {
+    if (typeof window.supabase === "undefined") {
+      throw new Error("Biblioteca Supabase não carregou. Verifica sua internet.");
+    }
+
+    sb = window.supabase.createClient(url, key);
+    log("status", "🔌 Cliente criado, testando query...", "aviso");
+
+    const { count, error } = await sb
+      .from("usuarios")
+      .select("*", { count: "exact", head: true });
+
+    if (error) throw error;
+
+    log("status",
+      "✅ CONEXÃO OK!\n\n" +
+      "URL: " + url + "\n" +
+      "Formato da key: " + (isJWT ? "JWT (antigo)" : "Publishable (novo)") + "\n" +
+      "Usuários cadastrados: " + count + "\n\n" +
+      "Agora testa os botões abaixo!",
+      "sucesso");
+
+    localStorage.setItem("teste_sb_url", url);
+    localStorage.setItem("teste_sb_key", key);
+  } catch (e) {
+    log("status",
+      "❌ ERRO: " + (e.message || e) + "\n\n" +
+      "Verifica:\n" +
+      "  • A URL termina em .supabase.co?\n" +
+      "  • A API Key foi copiada inteira?\n" +
+      "  • As 8 tabelas foram criadas?\n" +
+      "  • As policies de RLS foram aplicadas?",
+      "erro");
+  }
+}
+
+async function testarTabelas() {
+  if (!sb) return log("resultado", "❌ Conecta primeiro!", "erro");
+  const tabelas = ["usuarios","processos","riscos","tratamento_etapas",
+                   "organogramas","logs_auditoria","snapshots_kpi","sessoes"];
+  let saida = "📋 Verificando as 8 tabelas:\n\n";
+  for (const t of tabelas) {
+    try {
+      const { count, error } = await sb.from(t).select("*", { count:"exact", head:true });
+      if (error) saida += "❌ " + t + ": " + error.message + "\n";
+      else saida += "✅ " + t + ": " + count + " registro(s)\n";
+    } catch (e) {
+      saida += "💥 " + t + ": " + e.message + "\n";
+    }
+  }
+  log("resultado", saida, "sucesso");
+}
+
+async function testarUsuarios() {
+  if (!sb) return log("resultado", "❌ Conecta primeiro!", "erro");
+  const { data, error } = await sb.from("usuarios").select("*").order("criado_em",{ascending:false});
+  if (error) return log("resultado", "❌ " + error.message, "erro");
+  if (data.length === 0) return log("resultado", "ℹ️ Nenhum usuário cadastrado.", "aviso");
+  log("resultado", "👥 Total: " + data.length + "\n\n" + JSON.stringify(data, null, 2), "sucesso");
+}
+
+async function testarInsert() {
+  if (!sb) return log("resultado", "❌ Conecta primeiro!", "erro");
+  const matricula = "TESTE_" + Date.now();
+  const { data, error } = await sb.from("usuarios").insert({
+    matricula: matricula,
+    nome: "Usuário Teste",
+    divisao_sigla: "TESTE",
+    is_gestor: false
+  }).select().single();
+  if (error) return log("resultado", "❌ " + error.message, "erro");
+  log("resultado", "✅ Inserido!\n\n" + JSON.stringify(data, null, 2), "sucesso");
+}
+
+async function testarLimpar() {
+  if (!sb) return log("resultado", "❌ Conecta primeiro!", "erro");
+  const { error, count } = await sb.from("usuarios").delete({count:"exact"}).like("matricula","TESTE_%");
+  if (error) return log("resultado", "❌ " + error.message, "erro");
+  log("resultado", "🗑️ Removidos: " + (count || 0), "sucesso");
+}
+
+window.addEventListener("load", function() {
+  const u = localStorage.getItem("teste_sb_url");
+  const k = localStorage.getItem("teste_sb_key");
+  if (u) document.getElementById("url").value = u;
+  if (k) document.getElementById("key").value = k;
+});
+</script>
+
+</body>
+</html>

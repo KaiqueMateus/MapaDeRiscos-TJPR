@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Gestão de Riscos - SEPREC</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1929'/><path d='M50 20c-11 0-20 9-20 20v10h-5c-3 0-5 2-5 5v30c0 3 2 5 5 5h50c3 0 5-2 5-5V55c0-3-2-5-5-5h-5V40c0-11-9-20-20-20zm-12 30V40c0-7 5-12 12-12s12 5 12 12v10H38z' fill='%234dd0e1'/></svg>">  <!-- Bootstrap 5 --> 
+           <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> 
+           <!-- Bootstrap Icons --> 
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"> 
+            <!-- CSS Custom --> 
+             <link rel="stylesheet" href="assets/css/login.css"> 
+             <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+             <script src="assets/js/supabase-client.js"></script>
+<script>
+  console.log("Biblioteca:", typeof window.supabase);
+  console.log("Cliente sb:", typeof window.sb);
+</script>
+            
+</head>
+<body>
+
+<div class="login-page d-flex align-items-center justify-content-center">
+  <div class="login-card">
+
+    <div class="login-brand text-center">
+      <div class="brand-logo-lg">GR</div>
+      <h1 class="brand-title">GESTÃO DE RISCOS</h1>
+      <p class="brand-subtitle">REGISTRO, MONITORAMENTO, ANÁLISE E TRATAMENTO DE RISCOS</p>
+    </div>
+
+    <form id="loginForm" class="login-form mt-4" autocomplete="off">
+      <div class="form-group">
+        <label for="matricula"><i class="bi bi-person-badge"></i> Matrícula</label>
+        <input type="text" id="matricula" name="matricula" class="form-control-custom"
+               placeholder="Ex: 19372" required autofocus>
+      </div>
+
+      <div class="form-group mt-3">
+        <label for="senha"><i class="bi bi-lock"></i> Senha</label>
+        <div class="password-wrapper">
+          <input type="password" id="senha" name="senha" class="form-control-custom"
+                 placeholder="Digite sua senha" required>
+          <button type="button" class="toggle-password" id="togglePassword">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="errorMsg" class="error-msg mt-3" style="display:none;">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span id="errorText"></span>
+      </div>
+
+      <button type="submit" class="btn-login mt-4" id="btnLogin">
+        <span class="btn-text">Entrar <i class="bi bi-arrow-right"></i></span>
+        <span class="btn-loading" style="display:none;">
+          <span class="spinner"></span> Autenticando...
+        </span>
+      </button>
+    </form>
+
+    <div class="login-footer text-center mt-4">
+      <p>Acesso restrito a servidores autorizados</p>
+      <p class="version">Ambiente <strong>PRD</strong> &bull; v2.0</p>
+    </div>
+  </div>
+  <!-- Botão de troca de tema -->
+<button type="button" class="theme-toggle" id="themeToggle"
+        title="Alternar tema" aria-label="Alternar tema claro/escuro">
+  <i class="bi bi-sun-fill" id="themeIcon"></i>
+</button>
+</div>
+
+ <!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Chart.js --> <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<!-- Nosso JS --> <script src="assets/js/login.js"></script>
+
+</body>
+</html>

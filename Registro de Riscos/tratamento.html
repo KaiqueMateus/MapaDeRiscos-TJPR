@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plano de Tratamento de Riscos - TJPR</title>
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1929'/><path d='M50 15L20 28v22c0 20 13 37 30 42 17-5 30-22 30-42V28L50 15z' fill='%233ad48a'/></svg>">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="assets/css/riscos.css">
+  <link rel="stylesheet" href="assets/css/tratamento_extra.css">
+   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+             <script src="assets/js/supabase-client.js"></script>
+
+  <script>
+    const t = localStorage.getItem("mapa_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", t);
+    window.MODO_TRATAMENTO = true;
+  </script>
+  <script src="assets/js/auth.js"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="top-header d-flex justify-content-between align-items-center">
+  <div class="d-flex align-items-center gap-3">
+    <img src="assets/img/logo-tjpr.png" alt="TJPR" class="header-logo">
+    <div class="app-title-mini">
+      <div class="app-name">Plano de Tratamento</div>
+      <div class="app-desc">Ações de mitigação e monitoramento</div>
+    </div>
+  </div>
+
+  <div class="d-flex align-items-center gap-2">
+    <div class="user-badge">
+      <div class="user-avatar" id="userAvatar">--</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Carregando...</div>
+        <div class="user-division">
+          <i class="bi bi-diagram-3"></i>
+          <span id="userDivision">--</span>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-icon" onclick="toggleSom()" id="btnSom" title="Sons">
+      <i class="bi bi-volume-up-fill" id="iconSom"></i>
+    </button>
+    <button class="btn btn-icon" onclick="toggleTheme()" id="btnTheme" title="Tema">
+      <i class="bi bi-moon-stars-fill" id="iconTheme"></i>
+    </button>
+    <button class="btn btn-icon btn-backup" onclick="abrirModalBackup()" title="Backup e restauração">
+  <i class="bi bi-cloud-arrow-down-fill"></i>
+</button>
+    <button class="btn btn-logs" onclick="abrirModalLogs()">
+      <i class="bi bi-journal-text"></i> Logs
+    </button>
+    <button class="btn btn-logout" onclick="logout()">
+      <i class="bi bi-box-arrow-right"></i> Sair
+    </button>
+  </div>
+</header>
+
+<!-- HAMBURGER + PAINEL -->
+<button class="nav-hamburger" id="navHamburger" onclick="toggleNavMenu()" title="Menu">
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+  <span class="hamburger-bar"></span>
+</button>
+
+<aside class="nav-panel" id="navPanel">
+  <div class="nav-panel-header">
+    <div class="nav-panel-title">
+      <i class="bi bi-compass"></i>
+      <span>Navegação</span>
+    </div>
+    <button class="nav-panel-close" onclick="toggleNavMenu()">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <nav class="nav-links">
+
+    <a href="dashboard.html" class="nav-link" id="linkDashboard">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Dashboard</div>
+        <div class="nav-link-desc">Visão Geral e KPIs</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="index.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-clipboard-data-fill"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Registro de Riscos</div>
+        <div class="nav-link-desc">Cadastro e análise</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="tratamento.html" class="nav-link active">
+      <div class="nav-link-icon"><i class="bi bi-shield-check"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Tratamento de Riscos</div>
+        <div class="nav-link-desc">Ações e planos de mitigação</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+    <a href="referências.html" class="nav-link">
+      <div class="nav-link-icon"><i class="bi bi-book-half"></i></div>
+      <div class="nav-link-info">
+        <div class="nav-link-title">Referências</div>
+        <div class="nav-link-desc">Guias e normativos</div>
+      </div>
+      <i class="bi bi-chevron-right nav-link-arrow"></i>
+    </a>
+
+  </nav>
+
+  <div class="nav-panel-footer">
+    <span>Gestão de Riscos • TJPR</span>
+  </div>
+</aside>
+<div class="nav-overlay" id="navOverlay" onclick="toggleNavMenu()"></div>
+
+<!-- MAIN -->
+<main class="main-area">
+
+  <!-- HERO -->
+  <section class="hero-section">
+    
+    <div class="hero-content">
+      <div class="hero-icon"><i class="bi bi-shield-check"></i></div>
+      <div>
+        <h1 class="hero-title">Plano de Tratamento</h1>
+        <p class="hero-subtitle">
+          Riscos marcados para tratamento na divisão:
+          <span class="division-highlight" id="heroDivision">--</span>
+        </p>
+      </div>
+    </div>
+    <div class="hero-decoration">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+    </div>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpi-row">
+  <!-- 1º Total a Tratar - AZUL TEAL (mantém) -->
+  <div class="kpi-card kpi-total">
+    <div class="kpi-icon"><i class="bi bi-collection"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiTotal">0</div>
+      <div class="kpi-label">Total a Tratar</div>
+    </div>
+  </div>
+
+  <!-- 2º Concluídos - VERDE ✅ (trocado para kpi-baixo) -->
+  <div class="kpi-card kpi-baixo">
+    <div class="kpi-icon"><i class="bi bi-check2-circle"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiTratados">0</div>
+      <div class="kpi-label">Concluídos</div>
+    </div>
+  </div>
+
+  <!-- 3º Em Andamento - AMARELO 🟡 (mantém kpi-medio) -->
+  <div class="kpi-card kpi-medio">
+    <div class="kpi-icon"><i class="bi bi-clock-history"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiPendentes">0</div>
+      <div class="kpi-label">Em Andamento</div>
+    </div>
+  </div>
+
+  <!-- 4º Em Atraso - VERMELHO 🔴 (trocado para kpi-alto) -->
+  <div class="kpi-card kpi-alto">
+    <div class="kpi-icon"><i class="bi bi-alarm-fill"></i></div>
+    <div class="kpi-info">
+      <div class="kpi-number" id="kpiPrioritarios">0</div>
+      <div class="kpi-label">Em Atraso</div>
+    </div>
+  </div>
+</section>
+
+  <!-- SELETOR DE REGISTRO (SEM badge, COM botão PDF) -->
+  <section class="panel-card" id="secRegistro">
+    <div class="panel-card-header">
+      <h2><i class="bi bi-folder2-open"></i> Registro Atual</h2>
+      <div class="header-actions">
+        <button class="btn btn-export-pdf" onclick="exportarTratamentoPDF()" id="btnPDF" disabled>
+          <i class="bi bi-file-earmark-pdf"></i> Exportar PDF
+        </button>
+      </div>
+    </div>
+    <div class="divisao-filter">
+  <label>
+    <i class="bi bi-diagram-3"></i> Divisão
+    <span id="divisaoLockIconTrat" style="display:none;color:var(--accent-yellow, #f5c94a);margin-left:5px;"
+          title="Somente gestores podem alterar a divisão">
+      <i class="bi bi-lock-fill"></i>
+    </span>
+  </label>
+  <select id="filtroDivisaoTrat" class="form-control-dark">
+    <option value="">Todas</option>
+    <option value="AT">AT — Assessoria Técnica</option>
+    <option value="AA">AA — Assessoria de Atendimento</option>
+    <option value="DA">DA — Divisão Administrativa</option>
+    <option value="DC">DC — Divisão de Cálculos</option>
+    <option value="DPP">DPP — Divisão Pagamento Precatórios</option>
+    <option value="CJ">CJ — Consultoria Jurídica</option>
+    <option value="DCGA">DCGA</option>
+  </select>
+  <span id="divisaoAtualLabelTrat" class="divisao-atual-label"></span>
+</div>
+    <div class="registro-selector">
+      <label>Selecione um registro (processo de trabalho):</label>
+      <select id="seletorProcesso" class="form-control-dark" onchange="selecionarProcessoTratamento(this.value)">
+        <option value="">-- Selecione --</option>
+      </select>
+    </div>
+
+   <div class="registro-info" id="registroInfo" style="display:none;">
+  <div class="info-grid">
+
+    <!-- LINHA 1: Unidade | Processo | Objetivo | Macroprocesso -->
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-building"></i> Unidade
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Nome da unidade/setor responsável pelo processo"></i>
+      </span>
+      <span class="info-value" id="infoUnidade">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-diagram-2"></i> Processo
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Nome do processo de trabalho analisado"></i>
+      </span>
+      <span class="info-value" id="infoProcesso">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-bullseye"></i> Objetivo
+        <i class="bi bi-info-circle-fill info-tip"
+           title="O que se espera alcançar com este processo"></i>
+      </span>
+      <span class="info-value" id="infoObjetivo">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-signpost-split"></i> Macroprocesso
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Macroprocesso institucional ao qual este processo pertence"></i>
+      </span>
+      <span class="info-value" id="infoMacroprocesso">—</span>
+    </div>
+
+    <!-- LINHA 2: Resultado | Clientes | Áreas | Data -->
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-flag-fill"></i> Resultado
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Resultado esperado — produto, decisão ou entrega gerada"></i>
+      </span>
+      <span class="info-value" id="infoResultado">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-people-fill"></i> Clientes / Demandantes
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Quem solicita ou recebe o resultado do processo"></i>
+      </span>
+      <span class="info-value" id="infoClientes">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-diagram-3"></i> Áreas Envolvidas
+        <i class="bi bi-info-circle-fill info-tip"
+           title="Setores/divisões que participam do processo"></i>
+      </span>
+      <span class="info-value" id="infoAreas">—</span>
+    </div>
+
+    <div class="info-item">
+      <span class="info-label">
+        <i class="bi bi-calendar"></i> Data
+      </span>
+      <span class="info-value" id="infoData">—</span>
+    </div>
+
+  </div>
+</div>
+
+    <div id="emptyRegistro" class="empty-registro">
+      <i class="bi bi-shield-slash"></i>
+      <h3>Nenhum registro possui riscos para tratar</h3>
+      <p>Vá em <a href="index.html" style="color:var(--accent-teal);"><strong>Registro de Riscos</strong></a> e marque riscos com <strong>Tratar = Sim</strong>.</p>
+    </div>
+  </section>
+
+  <!-- PLANOS DE TRATAMENTO (SEM badge) -->
+  <section class="panel-card" id="secTratamentos" style="display:none;">
+    <div class="panel-card-header">
+      <h2><i class="bi bi-list-check"></i> Planos de Tratamento</h2>
+      <div class="header-actions">
+        <button class="btn btn-expand-all" onclick="toggleTodosCards()" id="btnExpandAll">
+          <i class="bi bi-arrows-expand"></i> Expandir todos
+        </button>
+      </div>
+    </div>
+
+    <div id="tratamentosLista"></div>
+
+    <div id="emptyTratamentos" class="empty-state" style="display:none;">
+      <div class="empty-icon"><i class="bi bi-shield-slash"></i></div>
+      <h3>Nenhum risco marcado para tratamento neste registro</h3>
+      <p>Marque riscos com <strong>Tratar = Sim</strong> no Registro de Riscos.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL LOGS -->
+<div class="modal-overlay" id="modalLogs" style="display:none;">
+  <div class="modal-content modal-lg">
+    <div class="modal-header">
+      <h2><i class="bi bi-journal-text"></i> Timeline de Ações</h2>
+      <button class="modal-close" onclick="fecharModalLogs()"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="timeline-container" id="logsList"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-export" onclick="exportarLogs()"><i class="bi bi-download"></i> Baixar TXT</button>
+      <button class="btn btn-cancel" onclick="fecharModalLogs()"><i class="bi bi-x-circle"></i> Fechar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast-notification"></div>
+<div id="confetti-container"></div>
+
+<script>
+  window.addEventListener("load", function() {
+    const MAPA = {
+      "DA":"Divisão Administrativa","DC":"Divisão de Cálculos",
+      "DPP":"Divisão de Pagamento de Precatórios","CJ":"Consultoria Jurídica",
+      "AA":"Assessoria de Atendimento","AT":"Assessoria Técnica",
+      "DCGA":"Divisão de Controle e Gestão de Aportes"
+    };
+    setTimeout(function() {
+      const u = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+      const sigla = String(u.divisao || "").trim().toUpperCase();
+      const heroEl = document.getElementById("heroDivision");
+      if (heroEl) heroEl.textContent = MAPA[sigla] || sigla || "-";
+    }, 100);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="assets/js/riscos.js"></script>
+<script src="assets/js/tratamento-override.js"></script>
+<script src="assets/js/backup.js"></script>
+<!-- MODAL BACKUP -->
+<div class="modal-overlay" id="modalBackup" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="bi bi-cloud-arrow-down-fill"></i> Backup & Restauração</h2>
+      <button class="modal-close" onclick="fecharModalBackup()"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- STATUS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-clock-history"></i> Último Backup</h4>
+        <div id="statusUltimoBackup" class="backup-status">Verificando...</div>
+      </div>
+
+      <!-- EXPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-download"></i> Exportar Backup</h4>
+        <p class="backup-desc">Baixa um arquivo <strong>.json</strong> com todos os seus dados: processos, riscos, tratamentos e logs.</p>
+        <button class="btn-backup-primary" onclick="exportarBackup()">
+          <i class="bi bi-cloud-arrow-down-fill"></i> Exportar TUDO
+        </button>
+      </div>
+
+      <!-- IMPORTAR -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-upload"></i> Importar Backup</h4>
+        <p class="backup-desc">Restaura dados de um arquivo <strong>.json</strong> exportado anteriormente.</p>
+        <button class="btn-backup-secondary" onclick="abrirSeletorArquivoBackup()">
+          <i class="bi bi-cloud-arrow-up-fill"></i> Selecionar arquivo...
+        </button>
+        <input type="file" id="inputArquivoBackup" accept=".json,application/json" style="display:none;" onchange="processarArquivoBackup(event)">
+      </div>
+
+      <!-- ESTATÍSTICAS -->
+      <div class="backup-secao">
+        <h4><i class="bi bi-bar-chart-line"></i> Estatísticas</h4>
+        <div id="estatisticasBackup" class="backup-stats">Carregando...</div>
+      </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div class="backup-secao backup-danger">
+        <h4><i class="bi bi-exclamation-triangle-fill"></i> Zona de Perigo</h4>
+        <p class="backup-desc">Ação irreversível. Faça backup antes.</p>
+        <button class="btn-backup-danger" onclick="limparTodosDados()">
+          <i class="bi bi-trash-fill"></i> Apagar TODOS os dados
+        </button>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="fecharModalBackup()">
+        <i class="bi bi-x-circle"></i> Fechar
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

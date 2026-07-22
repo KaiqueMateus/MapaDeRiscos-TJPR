@@ -1,0 +1,716 @@
+
+/* ============ CARDS DE TRATAMENTO ============ */
+.tratamento-card {
+  background: var(--overlay-white);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.tratamento-card:hover {
+  border-color: rgba(77, 208, 225, 0.4);
+}
+.tratamento-card.prioritario {
+  border-left: 4px solid var(--accent-yellow);
+}
+.tratamento-card.tratado {
+  border-left: 4px solid var(--accent-green);
+}
+
+.tratamento-header {
+  padding: 15px 20px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--card-border);
+}
+.tratamento-title {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 6px;
+}
+.tratamento-evento {
+  font-size: 14px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.badge-prioritario, .badge-tratado, .badge-pendente {
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.badge-prioritario {
+  background: rgba(245, 201, 74, 0.2);
+  color: var(--accent-yellow);
+  border: 1px solid rgba(245, 201, 74, 0.4);
+}
+.badge-tratado {
+  background: rgba(58, 212, 138, 0.2);
+  color: var(--accent-green);
+  border: 1px solid rgba(58, 212, 138, 0.4);
+}
+.badge-pendente {
+  background: rgba(224, 90, 90, 0.15);
+  color: var(--accent-red);
+  border: 1px solid rgba(224, 90, 90, 0.35);
+}
+
+.tratamento-body {
+  padding: 20px;
+}
+
+.tratamento-subhead {
+  color: var(--accent-teal);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+  margin: 5px 0 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.custo-beneficio-row {
+  display: flex; gap: 12px;
+  padding: 4px 0;
+}
+.cb-option {
+  flex: 1;
+  cursor: pointer;
+  margin: 0;
+}
+.cb-option input {
+  display: none;
+}
+.cb-option span {
+  display: block;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 2px solid var(--card-border);
+  background: var(--overlay-white);
+  text-align: center;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+  color: var(--text-muted);
+}
+.cb-option:hover span {
+  border-color: var(--accent-teal);
+}
+.cb-option input:checked + .cb-favoravel {
+  background: rgba(58, 212, 138, 0.15);
+  border-color: var(--accent-green);
+  color: var(--accent-green);
+}
+.cb-option input:checked + .cb-desfavoravel {
+  background: rgba(224, 90, 90, 0.15);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+}
+
+.tratamento-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 15px;
+  margin-top: 15px;
+  border-top: 1px solid var(--card-border);
+}
+
+/* ============ CARDS COLAPSÁVEIS ============ */
+.tratamento-header {
+  padding: 15px 20px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--card-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.2s;
+}
+.tratamento-header:hover {
+  background: rgba(77, 208, 225, 0.05);
+}
+
+.tratamento-header-content {
+  flex: 1;
+}
+
+.tratamento-toggle-icon {
+  color: var(--accent-teal);
+  font-size: 20px;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.tratamento-card.expanded .tratamento-toggle-icon {
+  transform: rotate(90deg);
+}
+
+.tratamento-body {
+  padding: 20px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s, padding 0.3s;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.tratamento-card.expanded .tratamento-body {
+  max-height: 2000px;
+  opacity: 1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Botão expandir todos */
+.btn-expand-all {
+  background: rgba(77, 208, 225, 0.1);
+  color: var(--accent-teal);
+  border: 1px solid rgba(77, 208, 225, 0.3);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.btn-expand-all:hover {
+  background: rgba(77, 208, 225, 0.2);
+  color: var(--accent-teal);
+  transform: translateY(-2px);
+}
+
+
+/* ============ CARDS COLAPSÁVEIS ============ */
+.tratamento-header {
+  padding: 15px 20px;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--card-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: background 0.2s;
+}
+.tratamento-header:hover {
+  background: rgba(77, 208, 225, 0.05);
+}
+
+.tratamento-header-content {
+  flex: 1;
+}
+
+.tratamento-toggle-icon {
+  color: var(--accent-teal);
+  font-size: 20px;
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.tratamento-card.expanded .tratamento-toggle-icon {
+  transform: rotate(90deg);
+}
+
+.tratamento-body {
+  padding: 20px;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s ease, opacity 0.3s, padding 0.3s;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.tratamento-card.expanded .tratamento-body {
+  max-height: 2000px;
+  opacity: 1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Botão expandir todos */
+.btn-expand-all {
+  background: rgba(77, 208, 225, 0.1);
+  color: var(--accent-teal);
+  border: 1px solid rgba(77, 208, 225, 0.3);
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.btn-expand-all:hover {
+  background: rgba(77, 208, 225, 0.2);
+  color: var(--accent-teal);
+  transform: translateY(-2px);
+}
+
+/* ============ CARDS EM ATRASO — ALERTA CRÍTICO ============ */
+.tratamento-card.em-atraso {
+  border: 2px solid var(--accent-red) !important;
+  background: rgba(224, 90, 90, 0.05);
+  box-shadow: 0 0 0 0 rgba(224, 90, 90, 0.7);
+  animation: pulseAtraso 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: visible;
+}
+
+@keyframes pulseAtraso {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(224, 90, 90, 0.6),
+                0 0 20px rgba(224, 90, 90, 0.3);
+    border-color: var(--accent-red);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(224, 90, 90, 0),
+                0 0 40px rgba(224, 90, 90, 0.6);
+    border-color: #ff4444;
+  }
+}
+
+.tratamento-card.em-atraso .tratamento-header {
+  background: linear-gradient(90deg,
+    rgba(224, 90, 90, 0.15) 0%,
+    rgba(224, 90, 90, 0.05) 100%);
+  border-bottom-color: rgba(224, 90, 90, 0.4);
+}
+
+/* Badge de atraso pulsante */
+.badge-atraso {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: var(--accent-red);
+  color: #fff;
+  border: 1px solid #ff4444;
+  animation: shakeAtraso 0.6s ease-in-out infinite;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(224, 90, 90, 0.5);
+}
+
+@keyframes shakeAtraso {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-2px) rotate(-2deg); }
+  75% { transform: translateX(2px) rotate(2deg); }
+}
+
+.badge-atraso i {
+  animation: bellRing 1s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-15deg); }
+  40% { transform: rotate(15deg); }
+  60% { transform: rotate(-10deg); }
+  80% { transform: rotate(10deg); }
+}
+
+/* Prazo em vermelho quando atrasado */
+.prazo-atrasado {
+  color: var(--accent-red) !important;
+  font-weight: 700 !important;
+  background: rgba(224, 90, 90, 0.1) !important;
+  border-color: var(--accent-red) !important;
+  animation: prazoBlink 1.2s ease-in-out infinite;
+}
+
+@keyframes prazoBlink {
+  0%, 100% { background: rgba(224, 90, 90, 0.1); }
+  50% { background: rgba(224, 90, 90, 0.25); }
+}
+
+/* Indicador de dias em atraso no header */
+.dias-atraso {
+  font-size: 11px;
+  color: var(--accent-red);
+  font-weight: 700;
+  margin-left: 8px;
+  animation: fadeInOut 1.5s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+.badge-planejado {
+  background: rgba(74, 144, 217, 0.2);
+  color: #4a90d9;
+  border: 1px solid rgba(74, 144, 217, 0.4);
+}
+
+.badge-concluido {
+  background: rgba(58, 212, 138, 0.25);
+  color: var(--accent-green);
+  border: 1px solid rgba(58, 212, 138, 0.5);
+}
+
+/* Card "Concluído" ganha aura verde suave */
+.tratamento-card.concluido {
+  border-left: 4px solid var(--accent-green);
+  background: rgba(58, 212, 138, 0.03);
+}
+.tratamento-card.concluido .tratamento-header {
+  background: linear-gradient(90deg, rgba(58,212,138,0.1) 0%, transparent 100%);
+}
+
+
+/* ============ NOVO SISTEMA DE 4 STATUS ============ */
+
+/* PLANEJADO (azul) */
+.badge-planejado {
+  background: rgba(74, 144, 217, 0.2);
+  color: #4a90d9;
+  border: 1px solid rgba(74, 144, 217, 0.4);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tratamento-card.planejado {
+  border-left: 4px solid #4a90d9;
+}
+
+/* CONCLUIDO (verde forte) */
+.badge-concluido {
+  background: rgba(58, 212, 138, 0.25);
+  color: var(--accent-green);
+  border: 1px solid var(--accent-green);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tratamento-card.concluido {
+  border-left: 4px solid var(--accent-green);
+  background: rgba(58, 212, 138, 0.03);
+  animation: none !important;
+}
+.tratamento-card.concluido .tratamento-header {
+  background: linear-gradient(90deg, rgba(58,212,138,0.1) 0%, transparent 100%);
+}
+
+/* Info extra do concluido */
+.concluido-info {
+  font-size: 11px;
+  color: var(--accent-green);
+  font-weight: 500;
+  margin-left: 8px;
+  font-style: italic;
+}
+
+/* Card em atraso pulsante */
+.tratamento-card.em-atraso {
+  border: 2px solid var(--accent-red) !important;
+  background: rgba(224, 90, 90, 0.05);
+  animation: pulseAtraso 1.5s ease-in-out infinite;
+}
+
+@keyframes pulseAtraso {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(224, 90, 90, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(224, 90, 90, 0);
+  }
+}
+
+.badge-atraso {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: var(--accent-red);
+  color: #fff;
+  border: 1px solid #ff4444;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  animation: shakeAtraso 0.6s ease-in-out infinite;
+}
+
+@keyframes shakeAtraso {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+.dias-atraso {
+  font-size: 11px;
+  color: var(--accent-red);
+  font-weight: 700;
+  margin-left: 8px;
+}
+
+.prazo-atrasado {
+  color: var(--accent-red) !important;
+  font-weight: 700 !important;
+  border-color: var(--accent-red) !important;
+  background: rgba(224, 90, 90, 0.1) !important;
+}
+
+/* ============ BOTOES CONCLUIR/DESCONCLUIR ============ */
+.tratamento-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-concluir {
+  background: linear-gradient(135deg, var(--accent-green), #2eb87a);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(58, 212, 138, 0.3);
+  transition: all 0.2s;
+}
+.btn-concluir:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 212, 138, 0.5);
+  color: #fff;
+}
+
+.btn-desconcluir {
+  background: rgba(159, 183, 193, 0.15);
+  color: var(--text-muted);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.btn-desconcluir:hover {
+  background: rgba(159, 183, 193, 0.25);
+  color: var(--text-main);
+}
+
+/* ============ KPI Em Atraso com alerta ============ */
+.kpi-card.kpi-alerta {
+  border: 1px solid var(--accent-red);
+  animation: kpiAlerta 2s ease-in-out infinite;
+}
+@keyframes kpiAlerta {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(224, 90, 90, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(224, 90, 90, 0);
+  }
+}
+.kpi-card.kpi-alerta .kpi-icon {
+  background: rgba(224, 90, 90, 0.2) !important;
+  color: var(--accent-red) !important;
+}
+.kpi-card.kpi-alerta .kpi-number {
+  color: var(--accent-red);
+}
+/* ============ FLASH CRÍTICO DE ATRASO ============ */
+.critical-alert-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 30%,
+    rgba(224, 90, 90, 0.35) 100%
+  );
+  opacity: 0;
+  animation: criticalFlash 2.5s ease-in-out;
+}
+
+@keyframes criticalFlash {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  30%  { opacity: 0.3; }
+  45%  { opacity: 1; }
+  60%  { opacity: 0.3; }
+  75%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* Banner de alerta no topo */
+.critical-alert-banner {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #c04040, #e05a5a, #c04040);
+  background-size: 200% 100%;
+  color: #fff;
+  padding: 14px 30px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 30px rgba(224, 90, 90, 0.6);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation:
+    bannerSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    bannerGradient 2s linear infinite,
+    bannerShake 0.8s ease-in-out infinite;
+  border: 2px solid #ff4444;
+}
+
+.critical-alert-banner i {
+  font-size: 22px;
+  animation: bellRingHard 0.5s ease-in-out infinite;
+}
+
+.critical-alert-banner .close-alert {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  transition: background 0.2s;
+}
+.critical-alert-banner .close-alert:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+@keyframes bannerSlideIn {
+  from { transform: translate(-50%, -100px); opacity: 0; }
+  to   { transform: translate(-50%, 0); opacity: 1; }
+}
+
+@keyframes bannerGradient {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+@keyframes bannerShake {
+  0%, 100% { transform: translate(-50%, 0) rotate(0); }
+  25%      { transform: translate(-52%, 0) rotate(-1deg); }
+  75%      { transform: translate(-48%, 0) rotate(1deg); }
+}
+
+@keyframes bellRingHard {
+  0%, 100% { transform: rotate(0); }
+  20%      { transform: rotate(-20deg); }
+  40%      { transform: rotate(20deg); }
+  60%      { transform: rotate(-15deg); }
+  80%      { transform: rotate(15deg); }
+}
+
+.critical-alert-banner.exiting {
+  animation: bannerSlideOut 0.4s ease-in forwards;
+}
+
+@keyframes bannerSlideOut {
+  from { transform: translate(-50%, 0); opacity: 1; }
+  to   { transform: translate(-50%, -100px); opacity: 0; }
+}
+
+/* ============ CORES DOS LINKS DE NAVEGAÇÃO ============ */
+
+/* 🟡 Dashboard - hover amarelo */
+.nav-link[href="dashboard.html"]:hover {
+  background: rgba(245, 201, 74, 0.12);
+  border-color: rgba(245, 201, 74, 0.4);
+}
+.nav-link[href="dashboard.html"]:hover .nav-link-icon {
+  background: rgba(245, 201, 74, 0.2);
+  color: var(--accent-yellow);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="dashboard.html"]:hover .nav-link-arrow {
+  color: var(--accent-yellow);
+}
+.nav-link[href="dashboard.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(245, 201, 74, 0.2), transparent);
+}
+
+/* 🔴 Tratamento de Riscos - hover vermelho (já existente, garantindo) */
+.nav-link[href="tratamento.html"]:hover {
+  background: rgba(224, 90, 90, 0.12);
+  border-color: rgba(224, 90, 90, 0.4);
+}
+.nav-link[href="tratamento.html"]:hover .nav-link-icon {
+  background: rgba(224, 90, 90, 0.2);
+  color: var(--accent-red);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="tratamento.html"]:hover .nav-link-arrow {
+  color: var(--accent-red);
+}
+.nav-link[href="tratamento.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(224, 90, 90, 0.2), transparent);
+}
+
+/* ⚪ Referências - hover cinza (já existente, garantindo) */
+.nav-link[href="referencias.html"]:hover {
+  background: rgba(159, 183, 193, 0.12);
+  border-color: rgba(159, 183, 193, 0.35);
+}
+.nav-link[href="referencias.html"]:hover .nav-link-icon {
+  background: rgba(159, 183, 193, 0.2);
+  color: var(--text-muted);
+  transform: scale(1.1) rotate(-5deg);
+}
+.nav-link[href="referencias.html"]:hover .nav-link-arrow {
+  color: var(--text-muted);
+}
+.nav-link[href="referencias.html"]:hover::before {
+  background: linear-gradient(90deg, transparent, rgba(159, 183, 193, 0.2), transparent);
+}
+
+/* 🎯 Estado ATIVO com cor específica */
+.nav-link[href="dashboard.html"].active {
+  background: linear-gradient(135deg, rgba(245, 201, 74, 0.18), rgba(245, 201, 74, 0.08));
+  border-color: rgba(245, 201, 74, 0.5);
+}
+.nav-link[href="dashboard.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--accent-yellow), #e88c3a);
+  color: #0a1929;
+}
+
+.nav-link[href="tratamento.html"].active {
+  background: linear-gradient(135deg, rgba(224, 90, 90, 0.18), rgba(224, 90, 90, 0.08));
+  border-color: rgba(224, 90, 90, 0.5);
+}
+.nav-link[href="tratamento.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--accent-red), #c04040);
+  color: #fff;
+}
+
+.nav-link[href="referencias.html"].active {
+  background: linear-gradient(135deg, rgba(159, 183, 193, 0.18), rgba(159, 183, 193, 0.08));
+  border-color: rgba(159, 183, 193, 0.5);
+}
+.nav-link[href="referencias.html"].active .nav-link-icon {
+  background: linear-gradient(135deg, var(--text-muted), #6b7d8f);
+  color: #fff;
+}
