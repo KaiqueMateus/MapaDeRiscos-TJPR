@@ -16,7 +16,7 @@
 
 ## 🖼️ Preview do Sistema
 
-<img width="1918" height="945" alt="Animação" src="https://github.com/user-attachments/assets/9982f733-de8a-4b15-b406-99d7f0214e90" />
+<img width="1918" height="1026" alt="Animação" src="https://github.com/user-attachments/assets/2fa61c18-2660-488c-9d5a-7016609cf866" />
 
 <!-- Substitua pelas suas capturas de tela -->
 
