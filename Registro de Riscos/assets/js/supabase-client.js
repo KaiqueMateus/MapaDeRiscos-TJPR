@@ -3,10 +3,10 @@
 // ============================================================
  
 const SUPABASE_URL =
-  "https://scdvgdkxmhchdzgebwwy.supabase.co";
+  "https://fantmmbufbbywqnhqess.supabase.co";
  
 const SUPABASE_KEY =
-  "sb_publishable_oFK97yikYWOO-c0iXtd3Nw_G0Dua5iW";
+  "sb_publishable_ZnyG-iK1vGuVKy2QltjJ3A_7VlpaB20"; 
  
 // Cria cliente global
 window.sb = window.supabase.createClient(
