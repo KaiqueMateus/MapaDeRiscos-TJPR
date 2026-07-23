@@ -1,7 +1,7 @@
 // ============ VALIDAÇÃO DE SESSÃO E PERMISSÕES ============
 
 // 🔒 Lista de matrículas com acesso ao dashboard
-const MATRICULAS_ADMIN = ["20145", "295816", "15280", "51587", "293898", "8406", "17222", "15343", "17691", "14929", "17904", "52176", "11018", "52201", "7289"];
+const MATRICULAS_ADMIN = ["20145", "295816", "15280", "51587", "293898", "8406", "17222", "15343", "17691", "14929", "17904", "52176", "11018", "52201", "7289", "10001"];
 
 (function() {
   const raw = sessionStorage.getItem("mapa_user");
