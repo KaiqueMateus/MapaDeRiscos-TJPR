@@ -30,6 +30,41 @@
     </div>
 
     <form id="loginForm" class="login-form mt-4" autocomplete="off">
+      <div class="demo-credenciais">
+  <h4>
+    <i class="bi bi-info-circle-fill"></i> Credenciais de Demonstração
+  </h4>
+
+  <div class="demo-user" onclick="preencherDemo('10001')">
+    <strong>👨‍💼 Ana Silva</strong>
+    <span class="badge-gestor">Gestora AT</span>
+    <code>10001</code>
+  </div>
+
+  <div class="demo-user" onclick="preencherDemo('10002')">
+    <strong>👤 João Oliveira</strong>
+    <span class="badge-comum">Usuário DC</span>
+    <code>10002</code>
+  </div>
+
+  <div class="demo-user" onclick="preencherDemo('99999')">
+    <strong>🔑 Admin Demo</strong>
+    <span class="badge-admin">Acesso total</span>
+    <code>99999</code>
+  </div>
+
+  <p class="senha-demo">
+    Senha para todos: <code>DEMO2026</code>
+  </p>
+</div>
+
+<script>
+function preencherDemo(matricula) {
+  document.getElementById("matricula").value = matricula;
+  document.getElementById("senha").value = "DEMO2026";
+  document.getElementById("senha").focus();
+}
+</script>
       <div class="form-group">
         <label for="matricula"><i class="bi bi-person-badge"></i> Matrícula</label>
         <input type="text" id="matricula" name="matricula" class="form-control-custom"
