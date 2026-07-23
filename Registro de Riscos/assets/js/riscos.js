@@ -3,7 +3,7 @@
 //  Termômetro + Timeline + PDF + Tema + Som + Skeleton
 // ============================================================
 // ============ MATRÍCULAS AUTORIZADAS A FILTRAR ============
-const MATRICULAS_GESTORES = ["20145", "295816", "15280", "51587", "293898", "8406", "17222", "15343", "17691", "14929", "17904", "52176", "11018", "52201", "7289"];
+const MATRICULAS_GESTORES = ["10001", "99999", "20145"];
 let divisaoAtiva = null;   // divisão que está sendo visualizada
 console.log("[Riscos] Script v3.0 carregado!");
 let filtroRiscoId = null;   // 🆕 filtro ativo por risco individual
