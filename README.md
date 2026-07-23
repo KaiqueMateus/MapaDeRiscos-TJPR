@@ -10,11 +10,13 @@
 ![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?logo=chartdotjs&logoColor=white)
 ![ISO 31000](https://img.shields.io/badge/ISO_31000-Gestão_de_Riscos-orange)
 
-🔗 **Demo ao vivo:** [mapa-riscos.vercel.app](#) &nbsp;•&nbsp; 💻 **Código:** [github.com/kaique/mapa-riscos](#)
+🔗 **Demo ao vivo:** [[mapa-riscos.vercel.app](https://mapa-de-riscos-tjpr.vercel.app/login.html)](#) &nbsp;•&nbsp; 💻 **Código:** [[github.com/kaique/mapa-riscos](https://github.com/KaiqueMateus/MapaDeRiscos-TJPR/tree/main/Registro%20de%20Riscos)](#)
 
 ---
 
 ## 🖼️ Preview do Sistema
+
+<img width="1918" height="945" alt="Animação" src="https://github.com/user-attachments/assets/9982f733-de8a-4b15-b406-99d7f0214e90" />
 
 <!-- Substitua pelas suas capturas de tela -->
 
@@ -24,7 +26,6 @@
 > |--------|-----------|-------|
 > | 👩‍💼 Gestora (acesso total) | `10001` | `DEMO2026` |
 > | 👤 Usuário comum | `10002` | `DEMO2026` |
-> | 🔧 Admin | `99999` | `DEMO2026` |
 
 ---
 
