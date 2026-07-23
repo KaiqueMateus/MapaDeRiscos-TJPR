@@ -1,4 +1,4 @@
-const SENHA_PADRAO = "SEPREC2026";
+const SENHA_PADRAO = "DEMO2026";
  
 const form       = document.getElementById("loginForm");
 const btnLogin   = document.getElementById("btnLogin");
