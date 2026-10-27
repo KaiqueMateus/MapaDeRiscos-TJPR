@@ -3,6 +3,7 @@ const SENHA_PADRAO = "SEPREC2026";
 // 🔑 Senhas específicas por matrícula (substituem a senha padrão)
 const SENHAS_ESPECIFICAS = {
   "TCE2026": "TCE2026"
+  "TESTE": "TESTE"
 };
 
 // 👁️ Matrículas somente leitura (reforço caso a coluna não venha do banco)
