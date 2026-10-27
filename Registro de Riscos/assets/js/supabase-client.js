@@ -1,58 +1,154 @@
 // ============================================================
 //  SUPABASE CLIENT - Conexão global
 // ============================================================
- 
+
 const SUPABASE_URL =
-  "https://fantmmbufbbywqnhqess.supabase.co";
- 
+  "https://scdvgdkxmhchdzgebwwy.supabase.co";
+
 const SUPABASE_KEY =
-  "sb_publishable_ZnyG-iK1vGuVKy2QltjJ3A_7VlpaB20"; 
- 
+  "sb_publishable_oFK97yikYWOO-c0iXtd3Nw_G0Dua5iW";
+
 // Cria cliente global
 window.sb = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
- 
+
 console.log("[Supabase] Cliente pronto ✅");
- 
+
+// ============================================================
+// 🎯 NÍVEL DE MONITORAMENTO - normalização única
+// ------------------------------------------------------------
+// O <select> do Plano de Tratamento usa os value "1", "0.75" e "0.5"
+// (STRING) e compara com ===. O Postgres devolve numeric (0.75).
+// Como 0.75 === "0.75" é false, a opção nunca vinha marcada e o campo
+// voltava para "Selecione...". Estas funções garantem que:
+//   - o que vai para o banco é SEMPRE número (1 / 0.75 / 0.5 / null)
+//   - o que volta para a tela é SEMPRE string ("1" / "0.75" / "0.5" / "")
+// ============================================================
+
+const NIVEIS_MONITORAMENTO_VALIDOS = [1, 0.75, 0.5];
+
+/** Retorna "1" | "0.75" | "0.5" | "" (para uso no <select>) */
+window.sbNormalizarNivelMonitoramento = function (valor) {
+  if (valor === null || valor === undefined || valor === "") return "";
+  const n = parseFloat(String(valor).replace(",", "."));
+  if (isNaN(n) || n <= 0) return "";
+  let melhor = NIVEIS_MONITORAMENTO_VALIDOS[0];
+  let menorDif = Infinity;
+  NIVEIS_MONITORAMENTO_VALIDOS.forEach(function (v) {
+    const dif = Math.abs(v - n);
+    if (dif < menorDif) { menorDif = dif; melhor = v; }
+  });
+  return String(melhor);
+};
+
+/** Retorna 1 | 0.75 | 0.5 | null (para gravar no banco) */
+window.sbNivelMonitoramentoNumero = function (valor) {
+  const s = window.sbNormalizarNivelMonitoramento(valor);
+  return s === "" ? null : parseFloat(s);
+};
+
+// ============================================================
+// 🎯 CACHE DE USUÁRIOS (id -> nome)
+// ------------------------------------------------------------
+// As colunas criado_por / concluido_por guardam o UUID do usuário.
+// A timeline exibia esse UUID cru. Aqui o mapa id->nome é carregado
+// uma única vez e usado pelos conversores.
+// ============================================================
+
+window.__mapaUsuarios = window.__mapaUsuarios || {};
+let _promessaCacheUsuarios = null;
+
+/** Registra o usuário logado no mapa (funciona mesmo offline) */
+function sbRegistrarUsuarioSessao() {
+  try {
+    const u = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+    if (u && u.id && u.nome) {
+      window.__mapaUsuarios[String(u.id)] = u.nome;
+    }
+  } catch (e) { /* sessão inválida */ }
+}
+
+/** Carrega (uma vez) todos os usuários para resolver nomes */
+window.sbGarantirCacheUsuarios = function () {
+  sbRegistrarUsuarioSessao();
+  if (_promessaCacheUsuarios) return _promessaCacheUsuarios;
+
+  _promessaCacheUsuarios = window.sb
+    .from("usuarios")
+    .select("id, nome, matricula")
+    .then(function (res) {
+      if (res.error) {
+        console.warn("[sbGarantirCacheUsuarios]", res.error);
+        return window.__mapaUsuarios;
+      }
+      (res.data || []).forEach(function (u) {
+        if (u && u.id) window.__mapaUsuarios[String(u.id)] = u.nome || String(u.matricula || "");
+      });
+      console.log("[Supabase] Cache de usuários:", Object.keys(window.__mapaUsuarios).length);
+      return window.__mapaUsuarios;
+    })
+    .catch(function (e) {
+      console.warn("[sbGarantirCacheUsuarios]", e);
+      return window.__mapaUsuarios;
+    });
+
+  return _promessaCacheUsuarios;
+};
+
+/** Converte o UUID em nome. Se não encontrar, devolve o próprio valor. */
+window.sbNomeUsuario = function (id) {
+  if (!id) return "";
+  const chave = String(id).trim();
+  return window.__mapaUsuarios[chave] || chave;
+};
+
+// Aquece o cache assim que o cliente sobe
+window.sbGarantirCacheUsuarios();
+
 // ============================================================
 // BUSCAR USUÁRIO
 // ============================================================
- 
+
 window.sbBuscarUsuario = async function (matricula) {
   const matriculaLimpa = String(matricula ?? "").trim();
- 
+
   console.log("[LOGIN] Consultando matrícula:", matriculaLimpa);
- 
+
   const { data, error, status, statusText } = await window.sb
     .from("usuarios")
     .select("*")
     .eq("matricula", matriculaLimpa)
     .eq("ativo", true)
     .maybeSingle();
- 
+
   console.log("[LOGIN] Resultado da consulta:", {
     data,
     error,
     status,
     statusText
   });
- 
+
   if (error) {
     console.error("[LOGIN] Erro retornado pelo Supabase:", error);
- 
+
     throw new Error(
       `Erro ao consultar usuário: ${error.message || "erro desconhecido"}`
     );
   }
- 
+
+  if (data && data.id) {
+    window.__mapaUsuarios[String(data.id)] = data.nome || matriculaLimpa;
+  }
+
   return data;
 };
+
 // ============================================================
 // REGISTRAR LOG
 // ============================================================
- 
+
 window.sbRegistrarLog = async function (
   usuarioId,
   divisao,
@@ -71,34 +167,13 @@ window.sbRegistrarLog = async function (
       entidade_id: entidadeId,
       detalhes: detalhes
     });
- 
+
   if (error) {
     console.error("[sbRegistrarLog]", error);
   }
 };
- 
-// ============================================================
-// TESTES TEMPORÁRIOS
-// ============================================================
- 
-window.sb
-  .from("usuarios")
-  .select("*")
-  .then(({ data, error }) => {
-    console.log("[Teste] Todos os usuários:", data);
-    console.log("[Teste] Erro:", error);
-  });
- 
-window.sb
-  .from("usuarios")
-  .select("*")
-  .eq("matricula", "20145")
-  .then(({ data, error }) => {
-    console.log("[Teste] Usuário 20145:", data);
-    console.log("[Teste] Erro 20145:", error);
-  });
 
-  // ============================================================
+// ============================================================
 // PROCESSOS - CRUD via Supabase
 // ============================================================
 
@@ -146,9 +221,9 @@ async function sbListarProcessos() {
     console.error("[sbListarProcessos]", error);
     return [];
   }
+
   return data || [];
 }
-
 
 /**
  * Cria um processo novo
@@ -156,22 +231,16 @@ async function sbListarProcessos() {
 async function sbCriarProcesso(dados) {
   const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
 
-  const unidade = dados.unidade || user.divisao;
-
   const payload = {
-    divisao_sigla:        unidade,     // 🎯 divisão = unidade
-    unidade:              unidade,
-    processo:             dados.processo,
-    objetivo:             dados.objetivo || null,
-    resultado:            dados.resultado || null,
-    clientes_demandantes: dados.clientes || null,
-    areas_envolvidas:     dados.areas || null,
-    macroprocesso:        dados.macroprocesso || null,
-    data_registro:        dados.data || null,
-    criado_por:           user.id
+    divisao_sigla: user.divisao,
+    equipe: dados.equipe || null,
+    processo: dados.processo,
+    objetivo: dados.objetivo || null,
+    compilado_por: dados.compilado || null,
+    analisado_por: dados.analisado || null,
+    data_registro: dados.data || null,
+    criado_por: user.id
   };
-
-  console.log("[sbCriarProcesso] Payload:", payload);
 
   const { data, error } = await sb
     .from("processos")
@@ -180,33 +249,25 @@ async function sbCriarProcesso(dados) {
     .single();
 
   if (error) {
-    console.error("[sbCriarProcesso] ERRO:", error);
+    console.error("[sbCriarProcesso]", error);
     return null;
   }
 
   return data;
 }
 
-
 /**
  * Atualiza processo existente
  */
 async function sbAtualizarProcesso(id, dados) {
   const payload = {
-    processo:             dados.processo,
-    objetivo:             dados.objetivo || null,
-    resultado:            dados.resultado || null,
-    clientes_demandantes: dados.clientes || null,
-    areas_envolvidas:     dados.areas || null,
-    macroprocesso:        dados.macroprocesso || null,
-    data_registro:        dados.data || null
+    equipe: dados.equipe || null,
+    processo: dados.processo,
+    objetivo: dados.objetivo || null,
+    compilado_por: dados.compilado || null,
+    analisado_por: dados.analisado || null,
+    data_registro: dados.data || null
   };
-
-  // 🎯 Se veio unidade, atualiza divisão junto
-  if (dados.unidade) {
-    payload.unidade       = dados.unidade;
-    payload.divisao_sigla = dados.unidade;
-  }
 
   const { data, error } = await sb
     .from("processos")
@@ -216,7 +277,7 @@ async function sbAtualizarProcesso(id, dados) {
     .single();
 
   if (error) {
-    console.error("[sbAtualizarProcesso] ERRO:", error);
+    console.error("[sbAtualizarProcesso]", error);
     return null;
   }
 
@@ -257,117 +318,23 @@ function sbConverterProcesso(p) {
 }
 
 // ============================================================
-// PROCESSOS - CRUD via Supabase
-// ============================================================
-
-async function sbListarProcessos() {
-  const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
-
-  // 🎯 Detecta se está na página de riscos (index) ou tratamento
-  const pathname = window.location.pathname.toLowerCase();
-  const naPaginaOperacional = pathname.includes("index.html")
-                            || pathname.includes("tratamento.html")
-                            || pathname === "/"
-                            || pathname.endsWith("/");
-
-  // 🎯 Regra:
-  // - Gestor + página operacional (index/tratamento) → vê TUDO (ignora filtro)
-  // - Gestor + dashboard → respeita o filtro selecionado
-  // - Não-gestor → só a divisão dele (sempre)
-  let divisoes;
-  if (user.is_gestor && naPaginaOperacional) {
-    divisoes = null;  // sem filtro = vê tudo
-  } else if (user.is_gestor) {
-    divisoes = getDivisoesFiltro();  // dashboard aplica filtro
-  } else {
-    divisoes = [user.divisao];  // não-gestor sempre da própria divisão
-  }
-
-  console.log("[sbListarProcessos] Gestor:", user.is_gestor, "| Página operacional:", naPaginaOperacional, "| Divisões:", divisoes);
-
-  let query = sb.from("processos")
-    .select("*")
-    .order("criado_em", { ascending: false });
-
-  // Só filtra se tem lista de divisões
-  if (divisoes && divisoes.length > 0) {
-    query = query.in("divisao_sigla", divisoes);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error("[sbListarProcessos]", error);
-    return [];
-  }
-  return data || [];
-}
-
-async function sbAtualizarProcesso(id, dados) {
-  const payload = {
-    equipe: dados.equipe || null,
-    processo: dados.processo,
-    objetivo: dados.objetivo || null,
-    compilado_por: dados.compilado || null,
-    analisado_por: dados.analisado || null,
-    data_registro: dados.data || null
-  };
-
-  const { data, error } = await sb
-    .from("processos")
-    .update(payload)
-    .eq("id", id)
-    .select()
-    .single();
-
-  if (error) {
-    console.error("[sbAtualizarProcesso]", error);
-    return null;
-  }
-  return data;
-}
-
-async function sbDeletarProcesso(id) {
-  const { error } = await sb.from("processos").delete().eq("id", id);
-  if (error) {
-    console.error("[sbDeletarProcesso]", error);
-    return false;
-  }
-  return true;
-}
-
-function sbConverterProcesso(p) {
-  if (!p) return null;
-  return {
-    id: p.id,
-    equipe: p.equipe || "",
-    processo: p.processo,
-    objetivo: p.objetivo || "",
-    compilado: p.compilado_por || "",
-    analisado: p.analisado_por || "",
-    data: p.data_registro || "",
-    divisao: p.divisao_sigla,
-    criadoPor: p.criado_por,
-    criadoEm: p.criado_em,
-    organogramas: []
-  };
-}
-
-// ============================================================
 // RISCOS - CRUD via Supabase
 // ============================================================
 
 async function sbListarRiscosDoProcesso(processoId) {
   if (!processoId) return [];
+
   const { data, error } = await sb
     .from("riscos")
     .select("*")
     .eq("processo_id", processoId)
     .order("criado_em", { ascending: true });
+
   if (error) {
     console.error("[sbListarRiscosDoProcesso]", error);
     return [];
   }
+
   return data || [];
 }
 
@@ -398,6 +365,7 @@ async function sbListarTodosRiscos() {
   }
 
   const { data: procs, error: eProcs } = await queryProcs;
+
   if (eProcs) {
     console.error("[sbListarTodosRiscos] procs:", eProcs);
     return [];
@@ -420,7 +388,6 @@ async function sbListarTodosRiscos() {
 
   console.log("[sbListarTodosRiscos] Retornou:", data.length, "riscos");
   return data || [];
-
 }
 
 async function sbCriarRisco(dados) {
@@ -452,6 +419,7 @@ async function sbCriarRisco(dados) {
     console.error("[sbCriarRisco]", error);
     return null;
   }
+
   return data;
 }
 
@@ -481,6 +449,7 @@ async function sbAtualizarRisco(id, dados) {
     console.error("[sbAtualizarRisco]", error);
     return null;
   }
+
   return data;
 }
 
@@ -516,21 +485,19 @@ function sbConverterRisco(r) {
     classificacaoNivel: r.classificacao_nivel || "",
     classificacaoResidual: r.classificacao_residual || "",
     criadoPor: r.criado_por,
+    criadoPorNome: window.sbNomeUsuario(r.criado_por),
     criadoEm: r.criado_em,
     tratamento: { historico: [] }
   };
 }
-
-console.log("=== IDs dos campos do modal ===");
-document.querySelectorAll("#modalRisco select, #modalRisco input, #modalRisco textarea").forEach(el => {
-  console.log(el.id, "=", el.value || "(vazio)");
-});
 
 // ============================================================
 // TRATAMENTO ETAPAS - CRUD via Supabase
 // ============================================================
 
 async function sbListarEtapasDoRisco(riscoId) {
+  await window.sbGarantirCacheUsuarios();
+
   const { data, error } = await sb
     .from("tratamento_etapas")
     .select("*")
@@ -541,11 +508,13 @@ async function sbListarEtapasDoRisco(riscoId) {
     console.error("[sbListarEtapasDoRisco]", error);
     return [];
   }
+
   return data || [];
 }
 
 async function sbListarTodasEtapas() {
   const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+  await window.sbGarantirCacheUsuarios();
 
   let query = sb
     .from("tratamento_etapas")
@@ -556,15 +525,18 @@ async function sbListarTodasEtapas() {
   }
 
   const { data, error } = await query.order("criado_em", { ascending: false });
+
   if (error) {
     console.error("[sbListarTodasEtapas]", error);
     return [];
   }
+
   return data || [];
 }
 
 async function sbCriarEtapa(riscoId, dados) {
   const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+  dados = dados || {};
 
   // Descobre próximo número de etapa
   const { data: existentes } = await sb
@@ -586,7 +558,8 @@ async function sbCriarEtapa(riscoId, dados) {
     responsavel: dados.responsavel || null,
     prazo: dados.prazo || null,
     descricao: dados.descricao || null,
-    nivel_monitoramento: parseFloat(dados.nivelMonitoramento) || null,
+    // 🎯 grava SEMPRE 1 / 0.75 / 0.5 / null (respeita o CHECK da coluna)
+    nivel_monitoramento: window.sbNivelMonitoramentoNumero(dados.nivelMonitoramento),
     monitoramento_obs: dados.monitoramento || null,
     reaberta: !!dados.reaberta,
     concluido: !!dados.concluido,
@@ -605,17 +578,21 @@ async function sbCriarEtapa(riscoId, dados) {
     console.error("[sbCriarEtapa]", error);
     return null;
   }
+
   return data;
 }
 
 async function sbAtualizarEtapa(etapaId, dados) {
+  dados = dados || {};
+
   const payload = {
     opcao: dados.opcao || null,
     custo_beneficio: dados.custoBeneficio || null,
     responsavel: dados.responsavel || null,
     prazo: dados.prazo || null,
     descricao: dados.descricao || null,
-    nivel_monitoramento: parseFloat(dados.nivelMonitoramento) || null,
+    // 🎯 grava SEMPRE 1 / 0.75 / 0.5 / null
+    nivel_monitoramento: window.sbNivelMonitoramentoNumero(dados.nivelMonitoramento),
     monitoramento_obs: dados.monitoramento || null
   };
 
@@ -630,6 +607,7 @@ async function sbAtualizarEtapa(etapaId, dados) {
     console.error("[sbAtualizarEtapa]", error);
     return null;
   }
+
   return data;
 }
 
@@ -651,6 +629,7 @@ async function sbConcluirEtapa(etapaId) {
     console.error("[sbConcluirEtapa]", error);
     return null;
   }
+
   return data;
 }
 
@@ -664,11 +643,15 @@ async function sbDeletarEtapa(etapaId) {
     .from("tratamento_etapas")
     .delete()
     .eq("id", etapaId);
+
   return !error;
 }
 
 function sbConverterEtapa(e) {
   if (!e) return null;
+
+  const nivelStr = window.sbNormalizarNivelMonitoramento(e.nivel_monitoramento);
+
   return {
     id: e.id,
     numeroEtapa: e.numero_etapa,
@@ -677,20 +660,28 @@ function sbConverterEtapa(e) {
     responsavel: e.responsavel || "",
     prazo: e.prazo || "",
     descricao: e.descricao || "",
-    nivelMonitoramento: parseFloat(e.nivel_monitoramento) || 0,
+    // 🎯 "1" | "0.75" | "0.5" | "" — casa com os value do <select>
+    nivelMonitoramento: nivelStr,
+    nivelMonitoramentoNum: nivelStr === "" ? 0 : parseFloat(nivelStr),
     monitoramento: e.monitoramento_obs || "",
     reaberta: !!e.reaberta,
     concluido: !!e.concluido,
     concluidoEm: e.concluido_em || null,
-    concluidoPor: e.concluido_por || null,
+    // 🎯 nome do usuário em vez do UUID (o id continua disponível)
+    concluidoPor: e.concluido_por ? window.sbNomeUsuario(e.concluido_por) : null,
+    concluidoPorId: e.concluido_por || null,
     emAtraso: !!e.em_atraso,
     criadoEm: e.criado_em,
-    criadoPor: e.criado_por
+    criadoPor: e.criado_por ? window.sbNomeUsuario(e.criado_por) : "",
+    criadoPorId: e.criado_por || null
   };
 }
+
 // Agrupa etapas por risco (pra popular risco.tratamento.historico)
 async function sbCarregarEtapasNosRiscos(listaRiscos) {
   if (!listaRiscos || listaRiscos.length === 0) return;
+
+  await window.sbGarantirCacheUsuarios();
 
   const ids = listaRiscos.map(r => r.id).filter(x => x);
   if (ids.length === 0) return;
@@ -739,10 +730,12 @@ async function sbListarLogs(limite) {
   }
 
   const { data, error } = await query;
+
   if (error) {
     console.error("[sbListarLogs]", error);
     return [];
   }
+
   return data || [];
 }
 
@@ -754,12 +747,13 @@ function sbConverterLog(l) {
     entidadeTipo: l.entidade_tipo,
     entidadeId: l.entidade_id,
     detalhes: l.detalhes,
-    usuario: l.usuarios ? l.usuarios.nome : "-",
+    usuario: l.usuarios ? l.usuarios.nome : window.sbNomeUsuario(l.usuario_id) || "-",
     matricula: l.matricula || (l.usuarios ? l.usuarios.matricula : "-"),  // 🆕 prioriza coluna direta
     divisao: l.divisao_sigla || "-",
     quando: l.criado_em
   };
 }
+
 // ============================================================
 // ORGANOGRAMAS - Storage + Metadados (bucket "organogramas_v1")
 // ============================================================
@@ -817,6 +811,7 @@ async function sbListarOrganogramas(processoId) {
     console.error("[sbListarOrganogramas]", error);
     return [];
   }
+
   return data || [];
 }
 
@@ -835,6 +830,7 @@ function sbConverterOrganograma(o) {
     storagePath: o.storage_path,
     url: sbGetUrlOrganograma(o.storage_path),
     uploadPor: o.upload_por,
+    uploadPorNome: window.sbNomeUsuario(o.upload_por),
     criadoEm: o.criado_em
   };
 }
@@ -843,6 +839,7 @@ async function sbDeletarOrganograma(id, storagePath) {
   const { error: sErr } = await sb.storage
     .from("organogramas_v1")
     .remove([storagePath]);
+
   if (sErr) console.warn("[sbDeletarOrganograma] Storage:", sErr);
 
   const { error: dbErr } = await sb
@@ -866,6 +863,8 @@ async function sbCarregarDadosDashboard() {
   console.log("[Dashboard] Divisões:", divisoes);
 
   try {
+    await window.sbGarantirCacheUsuarios();
+
     const { data: procsData } = await sb
       .from("processos")
       .select("*")
@@ -875,10 +874,12 @@ async function sbCarregarDadosDashboard() {
     if (procs.length === 0) return { todosProcessos: [], todosRiscos: [] };
 
     const procIds = procs.map(function(p) { return p.id; });
+
     const { data: riscosData } = await sb
       .from("riscos")
       .select("*")
       .in("processo_id", procIds);
+
     const riscosRaw = riscosData || [];
 
     let etapasRaw = [];
@@ -916,6 +917,7 @@ async function sbCarregarDadosDashboard() {
 
     console.log("[Dashboard] Total:", processos.length, "procs,", riscos.length, "riscos");
     return { todosProcessos: processos, todosRiscos: riscos };
+
   } catch (e) {
     console.error("[Dashboard]", e);
     return { todosProcessos: [], todosRiscos: [] };
@@ -926,9 +928,7 @@ async function sbCarregarDadosDashboard() {
 function calcularNivelAtualizado(risco, etapa) {
   const nivel = risco.prob * risco.imp;
   const residual = nivel * (risco.nivelControle || 1);
-
   if (!etapa || !etapa.nivelMonitoramento) return residual;
-
   const fatorMon = parseFloat(etapa.nivelMonitoramento) || 1;
   return residual * fatorMon;
 }
@@ -938,7 +938,7 @@ function calcularNivelAtualizado(risco, etapa) {
 // ============================================================
 
 const NOMES_DIVISOES_MULTI = {
-  "DA":   "Divisão Administrativa",
+  "DPROC":   "Divisão de Processamento",
   "DC":   "Divisão de Cálculos",
   "DPP":  "Divisão de Pagamento de Precatórios",
   "CJ":   "Consultoria Jurídica",
@@ -947,7 +947,7 @@ const NOMES_DIVISOES_MULTI = {
   "DCGA": "Divisão de Controle e Gestão de Aportes"
 };
 
-const MATRICULAS_ADMIN_MULTI = ["20145", "295816", "15280", "51587", "293898", "8406", "17222", "15343", "17691", "14929", "17904", "52176", "11018", "52201", "7289"];
+const MATRICULAS_ADMIN_MULTI = ["20145", "295816", "15280", "51587", "293898"];
 
 function isGestorMulti() {
   const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
@@ -995,6 +995,7 @@ function renderizarFiltroMultiDivisao(onChange) {
   const chipsCont = document.getElementById("chipsDivisoes");
   const lockIcon = document.getElementById("divisaoLockIcon");
   const label = document.getElementById("divisaoAtualLabel");
+
   if (!chipsCont) return;
 
   const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
@@ -1104,6 +1105,7 @@ function renderizarFiltroMultiDivisao(onChange) {
 
 // ============================================================
 // PROCESSOS - CRUD via Supabase (VERSÃO ATUALIZADA COM CAMPOS NOVOS)
+// Esta é a versão que prevalece (sobrescreve as declarações acima).
 // ============================================================
 
 async function sbListarProcessos() {
@@ -1141,7 +1143,42 @@ async function sbListarProcessos() {
     console.error("[sbListarProcessos]", error);
     return [];
   }
+
   return data || [];
+}
+
+async function sbCriarProcesso(dados) {
+  const user = JSON.parse(sessionStorage.getItem("mapa_user") || "{}");
+
+  const payload = {
+    // 🎯 Usa divisão dos dados (gestor escolheu) ou fallback pra do usuário
+    divisao_sigla:        dados.divisao || user.divisao,
+    unidade:              dados.unidade || null,
+    processo:             dados.processo,
+    objetivo:             dados.objetivo || null,
+    resultado:            dados.resultado || null,
+    clientes_demandantes: dados.clientes || null,
+    areas_envolvidas:     dados.areas || null,
+    macroprocesso:        dados.macroprocesso || null,
+    data_registro:        dados.data || null,
+    criado_por:           user.id
+  };
+
+  console.log("[sbCriarProcesso] Payload:", payload);
+
+  const { data, error } = await sb
+    .from("processos")
+    .insert(payload)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("[sbCriarProcesso] ERRO:", error);
+    return null;
+  }
+
+  console.log("[sbCriarProcesso] Salvo:", data);
+  return data;
 }
 
 async function sbAtualizarProcesso(id, dados) {
@@ -1201,6 +1238,7 @@ function sbConverterProcesso(p) {
     data:          p.data_registro || "",
     divisao:       p.divisao_sigla,
     criadoPor:     p.criado_por,
+    criadoPorNome: window.sbNomeUsuario(p.criado_por),
     criadoEm:      p.criado_em,
     organogramas:  []
   };
